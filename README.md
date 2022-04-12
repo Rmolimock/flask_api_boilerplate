@@ -1,0 +1,3 @@
+# Flask API Boilerplate
+
+The goal of this repo is to make it easier to build with a microservices architecture. I'd like to be able to clone the repo, set a few environment variables for the database connection, and have a nearly instantly functional service I can expand upon. This should abstract away any particular database cloud service, object relational mapping, and database migrations (backpopulating and version control).
