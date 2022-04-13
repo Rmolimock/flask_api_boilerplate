@@ -1,5 +1,7 @@
-# misc
+# misc security
 .*
+config*
+*.ini
 
 # inmfrastructure as code
 app.yaml
