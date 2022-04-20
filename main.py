@@ -1,18 +1,35 @@
-from setup import ENVS, orm_factory, app_factory
-from endpoints import some_endpoint
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from config import ConfigFile
+from db.credentials import DatabaseCredentials
 
 
-app, db, migrate = app_factory()
-
-app.register_blueprint(some_endpoint)
-
-# must import models for flask_migrate to track changes
-from models import *
-
-@app.route('/')
-def index():
-    return 'Home page'
+CONFIG_FILENAME = 'config.ini'
 
 
-if __name__ == '__main__':
-     app.run(host='127.0.0.1', port=5000, debug=True)
+config_file = ConfigFile(filename=CONFIG_FILENAME)
+        
+
+app = Flask(__name__)
+# in app factory, set other app.config data from config_file
+uri = DatabaseCredentials.uri_from_config(config_file=config_file)
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+
+    def __repr__(self):
+        return '<User %r>' % self.name
+
+
+db.create_all()
+
+admin = User(id=2, name='admin@example.com')
+db.session.add(admin)
+db.session.commit()
+
+a = User.query.all()
