@@ -1,1 +1,0 @@
-from models.model_template import *
