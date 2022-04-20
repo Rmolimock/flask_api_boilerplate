@@ -15,10 +15,3 @@ Feature: The API runs as is, immediately after cloning the repository.
       | config_file |
       | config.ini  |
 
-
-  Scenario: The API can save and load objects to the database
-  Given an object is created in memory
-  And it has data that must persist
-  When it is saved
-  And it is loaded by id
-  Then the loaded data matches the saved data
