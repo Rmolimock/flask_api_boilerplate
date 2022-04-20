@@ -1,6 +1,7 @@
 # misc security
 .*
-config*
+config.ini
+*.config
 *.ini
 
 # inmfrastructure as code
