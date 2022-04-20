@@ -1,0 +1,3 @@
+CONVERTERS = {
+    'Number': int,
+}
