@@ -1,9 +1,19 @@
-from pytest_bdd import scenarios, given, when, then
+from pytest_bdd import scenario, given, when, then
 from pytest_bdd.parsers import cfparse as parse
 from tests.step_defs import CONVERTERS
 
 
-scenarios('../features/runs_as_is.feature')
+@scenario('../features/run_as_is.feature', 'The database connection is established using data loaded from a config file')
+def test_create_db_connection_from_config():
+    pass
+
+
+'''
+It might be best to split this into multiple scenarios with shared steps in the future.
+I might want to add tags for tests that run the application context because it takes a moment
+for the app to load, and sometimes it could be enough to test if the config data is present
+and complete without having to also run the app and check if it set that config data.
+'''
 
 @given(parse('a "{config_file}" exists'), target_fixture='config_file')
 def existing_file(config_file):
@@ -34,17 +44,16 @@ def are_valid(config_file):
 
 @when('the app is running', target_fixture='app')
 def app_running():
-    try:
-        from main import app
-        assert app
-        return app
-    except Exception as e:
-        print('--', e)
-        assert False
+    from main import app
+    assert app
+    return app
 
 @then('the app uses a database connection with those credentials')
 def app_runs_locally(config_file, app):
-    from db.credentials import DatabaseCredentials
-    expected_uri = DatabaseCredentials.uri_from_config(config_file)
-    assert app.config.get('SQLALCHEMY_DATABASE_URI') == expected_uri
-
+    try:
+        from db.credentials import DatabaseCredentials
+        expected_uri = DatabaseCredentials.uri_from_config(config_file)
+        assert app.config.get('SQLALCHEMY_DATABASE_URI') == expected_uri
+    except Exception as e:
+        print('--', e)
+        assert False
