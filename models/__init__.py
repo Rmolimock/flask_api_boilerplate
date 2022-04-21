@@ -1,0 +1,1 @@
+from models.boilerplate_model import BoilerplateModel
