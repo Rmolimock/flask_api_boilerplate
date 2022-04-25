@@ -21,5 +21,6 @@ Feature: The API runs as is, immediately after cloning the repository.
   And it has data that must persist
   When it is saved
   And it is loaded by id
-  Then the loaded data matches the saved data
-
+  And it is loaded by an arbitrary attribute
+  Then the data loaded by id matches the saved data
+  Then the data loaded by an arbitrary attribute matches the saved data

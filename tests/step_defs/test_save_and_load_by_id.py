@@ -22,8 +22,8 @@ def object_created():
         assert object_instance
         return object_instance
     except Exception as e:
-        print('object_instance:', object_instance)
         print('--', e)
+        print('\nobject_instance:', object_instance)
         raise e
 
 
@@ -34,8 +34,8 @@ def has_data_that_must_persist(object):
         assert saved_object_data
         return saved_object_data
     except Exception as e:
-        print('saved_object_data:', saved_object_data)
         print('--', e)
+        print('\nsaved_object_data:', saved_object_data)
         assert False
 
 @when(parse('it is saved'))
@@ -44,32 +44,66 @@ def is_saved(object):
         object.save()
         pass
     except Exception as e:
-        print('object:', object)
         print('--', e)
+        print('\nobject:', object)
         assert False
 
-@when(parse('it is loaded by id'), target_fixture='loaded_object')
+@when(parse('it is loaded by id'), target_fixture='loaded_by_id_object')
 def is_loaded_by_id(saved_object_data):
     try:
         from models.boilerplate_model import BoilerplateModel
         id = saved_object_data.get('id')
-        loaded_object = BoilerplateModel.load_by_id(id)
-        assert loaded_object
-        return loaded_object
+        loaded_by_id_object = BoilerplateModel.load_by_id(id)
+        assert loaded_by_id_object
+        return loaded_by_id_object
     except Exception as e:
-        loaded_object.delete()
-        print('id:', saved_object_data.get('id'))
-        print('loaded_object:', loaded_object)
         print('--', e)
+        loaded_by_id_object.delete()
+        print('\nid:', saved_object_data.get('id'))
+        print('\nloaded_object:', loaded_by_id_object)
         assert False
 
-@then(parse('the loaded data matches the saved data'))
-def data_matches(saved_object_data, loaded_object):
+@when(parse('it is loaded by an arbitrary attribute'), target_fixture='loaded_by_attr_object')
+def is_loaded_by_attribute(saved_object_data):
     try:
-        assert saved_object_data == loaded_object.persistent_data()
-        loaded_object.delete()
-    except AssertionError as e:
-        loaded_object.delete()
-        print('saved_object_data:', saved_object_data)
-        print('loaded_object_data:', loaded_object.persistent_data())
+        from models.boilerplate_model import BoilerplateModel
+        attribute = 'boiler'
+        value = saved_object_data.get(attribute)
+        loaded_by_attr_object = BoilerplateModel.query.filter_by(boiler=value).first()
+        assert loaded_by_attr_object
+        return loaded_by_attr_object
+    except Exception as e:
         print('--', e)
+        print('\nattribute:', attribute)
+        print('\nvalue:', saved_object_data.get(attribute))
+        print('\nloaded_object:', loaded_by_attr_object)
+        loaded_by_attr_object.delete()
+        assert False
+
+@then(parse('the data loaded by id matches the saved data'))
+def data_by_id_matches(saved_object_data, loaded_by_id_object):
+    try:
+        assert saved_object_data == loaded_by_id_object.persistent_data()
+        loaded_by_id_object.delete()
+    except AssertionError as e:
+        print('--', e)
+        loaded_by_id_object.delete()
+        print('\nsaved_object_data:', saved_object_data)
+        print('\nloaded_object_data:', loaded_by_id_object.persistent_data())
+        assert False
+
+@then(parse('the data loaded by an arbitrary attribute matches the saved data'))
+def data_by_attr_matches(saved_object_data, loaded_by_attr_object):
+    try:
+        assert saved_object_data == loaded_by_attr_object.persistent_data()
+    except AssertionError as e:
+        print('--', e)
+        print('\nsaved_object_data:', saved_object_data)
+        print('\nloaded_object_data:', loaded_by_attr_object.persistent_data())
+        assert False
+
+
+'''
+  Then the data loaded by id matches the saved data
+  Then the data loaded by an arbitrary attribute matches the saved data
+'''
