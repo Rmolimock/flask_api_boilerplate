@@ -3,6 +3,7 @@ from db.sql_alchemy import db
 
 class BoilerplateModel(db.Model):
     id = db.Column(db.String(128), primary_key=True)
+    name = db.Column(db.String(128), unique=True)
     boiler = db.Column(db.String(128))
     plate = db.Column(db.String(128))
     __tablename__ = 'boilerplate_model'
@@ -33,13 +34,22 @@ class BoilerplateModel(db.Model):
         return dict(self.__dict__)
     
     def save(self):
-        print('saving', self.id)
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
         db.session.commit()
     
     @classmethod
-    def load_from_id(cls, id):
-        query = cls.query.filter(cls.id == id)
+    def load_by_id(cls, id):
+        query = cls.query.filter(id == id)
+        instance = query.one()
+        return instance
+
+    @classmethod
+    def load_one(cls, attribute, value):
+        query = cls.query.filter(attribute == value)
         instance = query.one()
         return instance
 
