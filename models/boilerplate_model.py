@@ -2,7 +2,7 @@ from db.sql_alchemy import db
 
 
 class BoilerplateModel(db.Model):
-    id = db.Column(db.String(128), primary_key=True)
+    id = db.Column(db.String(128), primary_key=True, unique=True)
     name = db.Column(db.String(128), unique=True)
     boiler = db.Column(db.String(128))
     plate = db.Column(db.String(128))
@@ -43,15 +43,9 @@ class BoilerplateModel(db.Model):
     
     @classmethod
     def load_by_id(cls, id):
-        query = cls.query.filter(id == id)
-        instance = query.one()
+        instance = cls.query.filter_by(id=id).one()
         return instance
 
-    @classmethod
-    def load_one(cls, attribute, value):
-        query = cls.query.filter(attribute == value)
-        instance = query.one()
-        return instance
 
 
 
