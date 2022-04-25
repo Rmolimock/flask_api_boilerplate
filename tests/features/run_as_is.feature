@@ -16,9 +16,10 @@ Feature: The API runs as is, immediately after cloning the repository.
       | config.ini  |
 
 
-  Scenario: Objects can be saved to and loaded from the database
+  Scenario: Objects can be saved to and loaded from the database by their id
   Given an object is created in memory
   And it has data that must persist
   When it is saved
   And it is loaded by id
   Then the loaded data matches the saved data
+
