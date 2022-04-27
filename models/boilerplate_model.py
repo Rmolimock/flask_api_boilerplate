@@ -28,6 +28,13 @@ class BoilerplateModel(db.Model):
     def __repr__(self):
         return '<BoilerplateModel %r>' % self.id
     
+    def to_dict(self):
+        dict_repr = self.__dict__
+        # must remove instance_state_ so as to be json serializable
+        if '_sa_instance_state' in dict_repr:
+            del dict_repr['_sa_instance_state']
+        return dict_repr
+
     def persistent_data(self):
         # this provides behavior tests with
         # more readable language than __dict__
@@ -43,8 +50,12 @@ class BoilerplateModel(db.Model):
     
     @classmethod
     def load_by_id(cls, id):
-        instance = cls.query.filter_by(id=id).one()
-        return instance
+        from sqlalchemy.exc import NoResultFound
+        try:
+            instance = cls.query.filter_by(id=id).one()
+            return instance
+        except NoResultFound as e:
+            return None
 
 
 

@@ -63,6 +63,20 @@ def is_loaded_by_id(saved_object_data):
         print('\nloaded_object:', loaded_by_id_object)
         assert False
 
+@when(parse('nothing is loaded by a bad id'))
+def is_loaded_by_bad_id(saved_object_data):
+    try:
+        from models.boilerplate_model import BoilerplateModel
+        id = saved_object_data.get('id') + 'bad_id'
+        loaded_by_id_object = BoilerplateModel.load_by_id(id)
+        assert not loaded_by_id_object
+    except Exception as e:
+        print('--', e)
+        loaded_by_id_object.delete()
+        print('\nid:', saved_object_data.get('id'))
+        print('\nloaded_object:', loaded_by_id_object)
+        assert False
+
 @when(parse('it is loaded by an arbitrary attribute'), target_fixture='loaded_by_attr_object')
 def is_loaded_by_attribute(saved_object_data):
     try:
@@ -92,18 +106,12 @@ def data_by_id_matches(saved_object_data, loaded_by_id_object):
         print('\nloaded_object_data:', loaded_by_id_object.persistent_data())
         assert False
 
-@then(parse('the data loaded by an arbitrary attribute matches the saved data'))
-def data_by_attr_matches(saved_object_data, loaded_by_attr_object):
+@then(parse('the data loaded by an arbitrary attribute contains that attribute'))
+def data_by_attr_matches(loaded_by_attr_object):
     try:
-        assert saved_object_data == loaded_by_attr_object.persistent_data()
+        assert loaded_by_attr_object.boiler
     except AssertionError as e:
         print('--', e)
-        print('\nsaved_object_data:', saved_object_data)
         print('\nloaded_object_data:', loaded_by_attr_object.persistent_data())
         assert False
 
-
-'''
-  Then the data loaded by id matches the saved data
-  Then the data loaded by an arbitrary attribute matches the saved data
-'''
