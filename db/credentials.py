@@ -18,12 +18,20 @@ class DatabaseCredentials:
         self.user = db_creds.get('user')
         self.password = db_creds.get('password')
         self.connection = db_creds.get('connection')
+        self.public_ip = db_creds.get('public_ip')
     
     @staticmethod
     def uri_from_config(config_file=None, config_dict=None):
+        from main import IN_PRODUCTION
         if not config_file and not config_dict:
             return None
 
         db_creds = DatabaseCredentials(config_file=config_file, config_dict=config_dict)
-
-        return f"{db_creds.type}://{db_creds.user}:{db_creds.password}@localhost:3306/{db_creds.name}"
+    
+        if IN_PRODUCTION:
+            print('*** WARNING IN PRODUCTION MODE ***')
+            return f"{db_creds.type}://{db_creds.user}:{db_creds.password}@/{db_creds.name}?unix_socket=/cloudsql/{db_creds.connection}"
+        else:
+            print('in development')
+            return f"{db_creds.type}://{db_creds.user}:{db_creds.password}@{db_creds.public_ip}/{db_creds.name}"
+        # DO NOT PUSH WITH IP HARD CODED HERE
