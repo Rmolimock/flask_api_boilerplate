@@ -1,5 +1,5 @@
 # Flask API Boilerplate
-This repo is intended to become a reusable starting point for the creation of new API services. Eventually, creating a basic REST service should be as simple as adding database credentials to a config file, describing the model(s) in json, and running the app. This project is being developed with TBB/BDD using pytest-bdd. Ideally (though not quite in actuality), all code should be developed to satisfy the description of high-level behavior.
+This repo is intended to become a reusable starting point for the creation of new API services. Eventually, creating a basic REST service should be as simple as adding database credentials to a config file, describing the model(s) in json, and running the app. This project is being developed with TDD/BDD using pytest-bdd. Ideally (though not quite in actuality), all code should be developed to satisfy the description of high-level behavior.
 
 ## Installation
 ```sh
