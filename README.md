@@ -25,14 +25,17 @@ flask run
 ```
 
 ## Features
-1. Connect to a database using user-provided credentials
-2. Establish Object Relational Mapping with SQLAlchemy
+1. Connect to a database using user-provided credentials ✓
+2. Establish Object Relational Mapping with SQLAlchemy ✓
 3. Establish database version control and backpopulation with FlaskMigrate
 4. Create classes for objects based on user-provided json data
 5. Create tables for those objects in the database if they don't already exist
 6. Insert values from that json data into the database
 7. Create basic GET, POST, PUT, and DELETE endpoints for each of those objects.
 8. Contain all boilerplate functionality in a v.0 Blueprint, and make it easy for the user to turn their modifications into a v.1.
+9. dynamically select which database to use (QA/staging/production) based on request data
+10. authenticate requesting service
+11. authorize requesting service
 
 
 
