@@ -30,8 +30,9 @@ class DatabaseCredentials:
     
         if IN_PRODUCTION:
             print('*** WARNING IN PRODUCTION MODE ***')
+            # must be a socket connection to work in GCP app engine
             return f"{db_creds.type}://{db_creds.user}:{db_creds.password}@/{db_creds.name}?unix_socket=/cloudsql/{db_creds.connection}"
         else:
-            print('in development')
+            print('*** development mode ***')
             return f"{db_creds.type}://{db_creds.user}:{db_creds.password}@{db_creds.public_ip}/{db_creds.name}"
         # DO NOT PUSH WITH IP HARD CODED HERE
