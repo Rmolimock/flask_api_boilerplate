@@ -1,43 +1,53 @@
-from config import ConfigFile
-from db.credentials import DatabaseCredentials
-from flask import Flask
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
 from os import getenv
+from flask import jsonify
+
+
+def create_app(config_filename):
+    from config import ConfigFile
+    from db.credentials import DatabaseCredentials
+    from flask import Flask
+    from flask_migrate import Migrate
+    from flask_sqlalchemy import SQLAlchemy
+
+
+    app = Flask(__name__)
+    config_file = ConfigFile(filename=config_filename)
+    uri = DatabaseCredentials.uri_from_config(config_file=config_file)
+    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db = SQLAlchemy(app)
+    migrate = Migrate(app, db)
+    return app
 
 
 IN_PRODUCTION = getenv('IN_PRODUCTION')
 CONFIG_FILENAME = 'config.ini'
 
-config_file = ConfigFile(filename=CONFIG_FILENAME)
-        
+app = create_app(CONFIG_FILENAME)
 
-app = Flask(__name__)
-# in app factory, set other app.config data from config_file
-uri = DatabaseCredentials.uri_from_config(config_file=config_file)
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+@app.route('/status', methods=['GET'], strict_slashes=False)
+def status():
+    return jsonify({
+        'status': 'OK'
+        }), 200
+
+# handle errors (abort)
+@app.errorhandler(400)
+def bad_request(error) -> str:
+    return jsonify({"error": "bad Request, https required"}), 400
 
 
-@app.route('/')
-def index():
-    return 'index'
+@app.errorhandler(404)
+def not_found(error) -> str:
+    return jsonify({"error": "not found"}), 404
 
-@app.route('/test')
-def tes():
-    from models import BoilerplateModel
-    from flask import jsonify
-    with app.app_context():
-        try:
-            m = BoilerplateModel.query.filter_by(boiler='test_boiler').first()
-            if m:
-                return jsonify(m.to_dict())
-            else:
-                return {}
-        except Exception as e:
-            return str(e)
+@app.errorhandler(403)
+def Forbidden(error) -> str:
+    return jsonify({"error": "forbidden"}), 403
+
+@app.errorhandler(401)
+def Unauthorized(error) -> str:
+    return jsonify({"error": "unauthorized"}), 401
 
 
 if __name__ == '__main__':
