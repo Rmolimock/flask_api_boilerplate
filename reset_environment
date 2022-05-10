@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export FLASK_ENV=''   
+
+export FLASK_APP=''
+
+export PYTHONPATH=''

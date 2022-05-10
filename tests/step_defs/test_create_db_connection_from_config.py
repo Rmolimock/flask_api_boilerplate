@@ -43,10 +43,9 @@ def are_valid(config_file):
         assert credential in config_file.database_credentials
 
 @when('the app is running', target_fixture='app')
-def app_running():
-    from main import app
-    assert app
-    return app
+def app_running(app_setup):
+    assert app_setup
+    return app_setup
 
 @then('the app uses a database connection with those credentials')
 def app_runs_locally(config_file, app):
