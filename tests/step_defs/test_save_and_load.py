@@ -3,7 +3,7 @@ from pytest_bdd.parsers import cfparse as parse
 from tests.step_defs import CONVERTERS
 
 
-@scenario('../features/run_as_is.feature', 'Objects can be saved to and loaded from the database by their id')
+@scenario('../features/run_as_is.feature', 'Objects can be saved to and loaded from the database')
 def test_save_and_load_with_db():
     pass
 
@@ -23,7 +23,6 @@ def object_created():
         return object_instance
     except Exception as e:
         print('--', e)
-        print('\nobject_instance:', object_instance)
         raise e
 
 
