@@ -5,3 +5,18 @@ export FLASK_ENV=''
 export FLASK_APP=''
 
 export PYTHONPATH=''
+
+echo "*** *** WARNING *** *** This will delete the migrations folder, alembic versions, and boilerplate_model from your database."
+
+
+read -p "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+
+if [ -d "./migrations" ]
+then 
+    rm -r migrations
+fi
+
+export user=$(awk -F "=" '/user/ {print $2}' config.ini)
+export password=$(awk -F "=" '/password/ {print $2}' config.ini)
+export database=$(awk -F "=" '/name/ {print $2}' config.ini)
+mysql -u $user -D $database -p -e "DROP TABLE alembic_version; DROP TABLE boilerplate_model;" --host 127.0.0.1

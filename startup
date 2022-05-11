@@ -13,3 +13,11 @@ export FLASK_APP='main'
 export PYTHONPATH='.'
 
 python3 db/create_tables.py
+
+flask db init
+
+flask db migrate -m "Initial migration."
+
+flask db upgrade
+
+python3 db/create_tables.py
