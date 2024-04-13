@@ -13,7 +13,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 from models import *
 
 # Initialize the mysql connection
-#mysql_connection(app) waiting for db to be ready in production
+mysql_connection(app)
 
 # Register all the routes in the app
 register_blueprints(app)
@@ -30,6 +30,6 @@ def after_request(response):
     db.session.remove()
     return response
 
-@app.route('/')
+@app.route('/', methods=['GET'], strict_slashes=False)
 def status():
     return 'OK', 200

@@ -1,6 +1,6 @@
 from routes.client import clients_v1
 
-@clients_v1.route("", methods=["GET"])
+@clients_v1.route("/", methods=["GET"])
 def client():
     from models import Client
 

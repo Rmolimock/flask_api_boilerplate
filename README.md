@@ -24,4 +24,11 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 1. `git clone https://github.com/Rmolimock/flask_api_boilerplate.git`
 2. `cd flask_api_boilerplate`
 3. `pip install -r requirements.txt`
-4. `FLASK_DEBUG=True python3 -m flask --app main run`
+4. Create a .env file with the following contents:
+- DB_NAME=
+- DB_USER=
+- DB_PASSWORD=
+- DB_HOST=
+- DB_PORT=
+- FLASK_APP=main.py
+5. `FLASK_DEBUG=True flask run`

@@ -16,10 +16,8 @@ db_password = getenv("DB_PASSWORD")
 db_host = getenv("DB_HOST")
 db_port = getenv("DB_PORT")
 
-'''
 if not (db_name and db_user and db_password and db_host and db_port):
     raise ValueError("Database credentials are not set. Please set them in a .env file")
-'''
 
 
 def mysql_connection(app):
