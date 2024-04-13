@@ -1,0 +1,7 @@
+Flask==3.0.3
+Flask-Cors==4.0.0
+Flask-Migrate==4.0.7
+SQLAlchemy==2.0.29
+Flask-SQLAlchemy==3.1.1
+PyMySQL==1.1.0
+pytest==8.1.1
