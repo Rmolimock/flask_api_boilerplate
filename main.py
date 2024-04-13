@@ -13,7 +13,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 from models import *
 
 # Initialize the mysql connection
-mysql_connection(app)
+#mysql_connection(app)
 
 # Register all the routes in the app
 register_blueprints(app)
