@@ -26,7 +26,7 @@ def mysql_connection(app):
     if PRODUCTION:
         uri = "mysql+pymysql://name:password@host/database$default"
     else:
-        uri = "mysql+pymysql://name:password@localhost:[port]/flask_boilerplate_db"
+        uri = "mysql+pymysql://root:11111@localhost:3306/flask_boilerplate_db"
 
     app.config.update(
         SQLALCHEMY_DATABASE_URI=uri,
