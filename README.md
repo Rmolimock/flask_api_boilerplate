@@ -10,6 +10,7 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - [ ] Automatically create tables in the database for client and user models
 - [ ] Flask-Migrate for database version control
 - [ ] CRUD routes for clients and users
+- [ ] Pytests for all of the above
 
 ## Requirements
 - Python 3.10

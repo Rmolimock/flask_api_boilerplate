@@ -9,6 +9,9 @@ app = create_app()
 # CHANGE THIS IN PRODUCTION
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
+# import all models so that they are registered with the db
+from models import *
+
 # Initialize the mysql connection
 mysql_connection(app)
 
