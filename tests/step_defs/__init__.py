@@ -1,3 +1,0 @@
-CONVERTERS = {
-    'Number': int,
-}
