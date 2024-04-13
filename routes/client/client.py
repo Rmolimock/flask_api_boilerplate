@@ -4,4 +4,4 @@ from routes.client import clients_v1
 def client():
     from models import Client
 
-    return Client.load_all_dicts(), 200
+    return Client.load_all_dict(), 200
