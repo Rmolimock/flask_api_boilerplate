@@ -18,18 +18,11 @@ mysql_connection(app)
 # Register all the routes in the app
 register_blueprints(app)
 
-@app.before_request
-def before_request():
-    # Authorization logic goes here
-    pass
-
-@app.after_request
-def after_request(response):
-    # close the db session after each request to avoid memory leaks
-    from db import db
-    db.session.remove()
-    return response
+# Register the before and after request handlers
+from before_requests import before_request
+from after_requests import after_request
 
 @app.route('/', methods=['GET'], strict_slashes=False)
 def status():
+    print('in the request')
     return 'OK', 200
