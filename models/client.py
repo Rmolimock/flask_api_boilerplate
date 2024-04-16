@@ -11,17 +11,32 @@ class Client(BaseModel):
 
     def __init__(self, **kwargs):
         '''
-        Initialize the client
+        Initialize the client. Create a unique token for authorization.
         '''
+        from uuid import uuid4
+
+
+        # ensure the client has a name and it is a string
         if 'name' not in kwargs:
             raise ValueError('Name is required')
-        if 'token' not in kwargs:
-            raise ValueError('Token is required')
         
-        if not isinstance(kwargs.get('name'), str):
-            raise ValueError('Name must be a string')
-        if not isinstance(kwargs.get('token'), str):
-            raise ValueError('Token must be a string')
+        name = kwargs.get('name')
+        
+        if not isinstance(name, str):
+            raise TypeError('Name must be a string')
+        
+        # check if the client already exists
+        existing_client = Client.load_by_attr('name', name)
+        if existing_client:
+            raise ValueError('Client already exists')
+        
+        # do not allow clients to create their own tokens
+        if 'token' in kwargs:
+            del kwargs['token']
+        
+        # create a unique token for the client
+        token = str(uuid4())
+        self.token = token
 
         super(Client, self).__init__(**kwargs)
 

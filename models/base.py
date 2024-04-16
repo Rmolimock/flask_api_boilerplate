@@ -57,6 +57,13 @@ class BaseModel(db.Model):
         '''
         return cls.query.get(id)
     
+    @classmethod
+    def load_by_attr(cls, attr, value):
+        '''
+        Load an object by an attribute and its value
+        '''
+        return cls.query.filter(getattr(cls, attr) == value).first()
+    
     def to_dict(self):
         '''
         Serialize the object
