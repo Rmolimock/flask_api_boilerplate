@@ -4,6 +4,7 @@ def create_app():
     app = Flask(__name__)
     return app
 
+
 def register_blueprints(app):
     from routes import API_VERSIONS
 
