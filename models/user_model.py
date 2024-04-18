@@ -5,7 +5,7 @@ class User(BaseModel):
 
     __tablename__ = "users"
 
-    name = db.Column(db.String(36), nullable=False)
+    name = db.Column(db.String(36), nullable=False, unique=True)
 
     def __init__(self, **kwargs):
         """
