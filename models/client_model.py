@@ -1,4 +1,4 @@
-from models.base import BaseModel, db
+from models.base_model import BaseModel, db
 
 
 class Client(BaseModel):
@@ -8,7 +8,7 @@ class Client(BaseModel):
 
     __tablename__ = "clients"
 
-    name = db.Column(db.String(36), nullable=False)
+    name = db.Column(db.String(36), nullable=False, unique=True)
     token = db.Column(db.String(36), nullable=False)
 
     def __init__(self, **kwargs):
