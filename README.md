@@ -5,12 +5,10 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - [X] Automatically connect to mysql database, given user-provided credentials
 - [X] A base model for serializing, deserializing, and shared methods
 - [X] A client model for application clients
-- [ ] A user model for identifying individual users
-- [ ] A client authorization system
+- [X] A user model for identifying individual users
 - [X] Automatically create tables in the database for client models
-- [ ] Also for user models
 - [ ] Flask-Migrate for database version control
-- [ ] CRUD routes for clients and users
+- [X] CRUD routes for clients and users
 - [ ] Pytests for all of the above
 
 ## Requirements
