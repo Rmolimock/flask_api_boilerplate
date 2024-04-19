@@ -1,6 +1,7 @@
 from app import create_app, register_blueprints
 from db import mysql_connection
 from flask_cors import CORS
+from flask_migrate import Migrate
 
 # Initialize the flask app
 app = create_app()
@@ -13,7 +14,10 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 from models import *
 
 # Initialize the mysql connection
-mysql_connection(app)
+db = mysql_connection(app)
+
+# Initialize the migration engine
+migrate = Migrate(app, db)
 
 # Register all the routes in the app
 register_blueprints(app)

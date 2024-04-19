@@ -7,7 +7,7 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - [X] A client model for application clients
 - [X] A user model for identifying individual users
 - [X] Automatically create tables in the database for client models
-- [ ] Flask-Migrate for database version control
+- [X] Flask-Migrate for database version control
 - [X] CRUD routes for clients and users
 - [ ] Pytests for all of the above
 

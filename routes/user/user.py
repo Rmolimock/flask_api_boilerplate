@@ -12,11 +12,17 @@ def create_user():
     from models import User
 
     name = request.form.get("name")
-    if not name:
-        return "User name is required\n", 400
+    handle = request.form.get("handle")
+    if not (name and handle):
+        return "User name and handle are required\n", 400
+    
+    data = {
+        "name": name,
+        "handle": handle
+    }
 
     try:
-        user = User(**{"name": name})
+        user = User(**data)
     except Exception as e:
         return str(e), 500
 
@@ -70,14 +76,22 @@ def get_by_id(id):
 
     if request.method == "PUT":
         name = request.form.get("name")
-        if not name:
-            return "User name is required\n", 400
+        handle = request.form.get("handle")
+        if not (name or handle):
+            return "User name or handle is required\n", 400
 
-        existing_user = User.load_by_attr("name", name)
-        if existing_user and existing_user.id != user.id:
-            return "User name is taken\n", 400
+        if name:
+            name_taken = User.load_by_attr("name", name)
+            if name_taken and name_taken.id != user.id:
+                return "User name is taken\n", 400
+            user.name = name
+        
+        if handle:
+            handle_taken = User.load_by_attr("handle", handle)
+            if handle_taken and handle_taken.id != user.id:
+                return "User handle is taken\n", 400
+            user.handle = handle
 
-        user.name = name
         user.save()
 
         return user.to_dict(), 200

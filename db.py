@@ -23,6 +23,7 @@ if not (db_name and db_user and db_password and db_host and db_port):
 def mysql_connection(app):
     """
     Initialize the mysql connection
+    Return: db object
     """
 
     # create the connection uri
@@ -43,3 +44,5 @@ def mysql_connection(app):
     # create tables for all the models
     with app.app_context():
         db.create_all()
+
+    return db
