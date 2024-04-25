@@ -48,9 +48,7 @@ def before_request():
     
     client = client_from_header(header)
     if not client:
-        print("Invalid token")
         return invalid_token
 
     request.client = client
     request.token = client.token
-    print(f"Client: {client.name}")

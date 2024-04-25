@@ -7,5 +7,4 @@ def after_request(response):
     from db import db
 
     db.session.remove()
-    print("in the after")
     return response

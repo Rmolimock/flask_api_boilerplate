@@ -29,5 +29,4 @@ from after_requests import after_request
 
 @app.route("/", methods=["GET"], strict_slashes=False)
 def status():
-    print("in the request")
     return "OK", 200
