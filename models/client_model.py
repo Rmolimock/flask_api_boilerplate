@@ -27,8 +27,8 @@ class Client(BaseModel):
             raise TypeError("Name must be a string")
 
         # check if the client already exists
-        existing_client = Client.load_by_attr("name", name)
-        if existing_client:
+        name_taken = Client.load_by_attr("name", name)
+        if name_taken:
             raise ValueError("Client already exists")
 
         # do not allow clients to create their own tokens
