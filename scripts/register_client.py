@@ -7,23 +7,24 @@ Usage:
 
 Return: <client_token>
 """
-from models.client_model import Client
+from main import app
 from db import db
+from models.client_model import Client
+
 
 def create_client(name):
-    from main import app
 
 
     with app.app_context():
         existing_client = Client.load_by_attr("name", name)
 
         if existing_client:
+            db.session.remove()
             return "Client name already in use.\n"
         
         client = Client(**{"name": name})
         client.save()
 
-        db.session.remove()
 
         return client.token
 
@@ -35,7 +36,7 @@ if __name__ == "__main__":
     
     # check for correct usage
     if not len(argv) == 2:
-        print('\nUsage:\n\tpython register_client.py <client_name>\n')
+        print('\nError. Correct usage:\n\tpython register_client.py <client_name>\n')
         exit()
 
     name = argv[1]
@@ -43,4 +44,3 @@ if __name__ == "__main__":
     token = create_client(name)
 
     print(token)
-
