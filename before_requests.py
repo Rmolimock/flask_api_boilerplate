@@ -3,6 +3,8 @@ Before request functions for Flask app.
 Handles client authorization.
 '''
 from main import app
+from models.client_model import Client
+
 
 def client_header(request):
     # check for an Authorization header
@@ -23,8 +25,6 @@ def client_from_header(header):
     Use client authorization header token to get client object.
     Use client_header_is_valid(header) prior to calling this function.
     '''
-    from models.client_model import Client
-
     # extract token from Authorization header
     token = header[7:]
 

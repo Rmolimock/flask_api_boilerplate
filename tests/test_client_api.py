@@ -3,6 +3,7 @@ Tests for the client API endpoints, GET all and GET, PUT, DELETE by id
 '''
 import pytest
 from main import app
+from uuid import uuid4
 
 
 @pytest.fixture()
@@ -26,6 +27,12 @@ def mock_client(mocker):
     mock_client = mocker.patch('routes.client.client.Client')
     return mock_client
 
+@pytest.fixture()
+def mock_client_before_request(mocker):
+    # Initialize a shared mock client for TestClients tests
+    mock_client = mocker.patch('before_requests.Client')
+    return mock_client
+
 
 class TestClients:
     """
@@ -42,27 +49,44 @@ class TestClients:
         """
         Test the GET all clients endpoint without authorization
         """
+        # MOCK VALUES (none)
+        # ACTIONS
         response = api.get("/v1/clients/")
+
+        # ASSERTIONS
         assert response.status_code == 200
     
-    def test_authorized_get_all(self, api):
+    def test_authorized_get_all(self, api, mock_client_before_request):
         """
         Test the GET all clients endpoint with authorization
         """
+        # MOCK VALUES
+        mock_token = str(uuid4())
         headers = {
-            'Authorization': 'Bearer test_token'
+            'Authorization': f'Bearer {mock_token}'
         }
+
+        # ACTIONS
         response = api.get("/", headers=headers)
+
+        # ASSERTIONS
         assert response.status_code == 200
+        mock_client_before_request.load_by_attr.assert_called_once_with("token", mock_token)
+        
     
     def test_get_by_id(self, api, mock_client):
         """
         Test the GET client by id endpoint without authorization
         """
-        # MOCK
-        
+        # MOCK VALUES
+        mock_id = str(uuid4())
         mock_client.load_by_id.return_value = mock_client
-        mock_client.id = id
 
-        response = api.get(f'/v1/clients/{id}')
+        # ACTIONS
+        response = api.get(f'/v1/clients/{mock_id}')
+
+        # ASSERTIONS
         assert response.status_code == 200
+        mock_client.load_by_id.assert_called_once_with(mock_id)
+
+
