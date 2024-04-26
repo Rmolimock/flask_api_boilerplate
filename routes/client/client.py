@@ -4,6 +4,7 @@ GET all clients
 GET, DELETE, PUT client by id
 """
 
+from models import Client
 from routes.client import clients_v1
 from authorization import authorized_client
 
@@ -14,7 +15,6 @@ def all_clients():
     Get all clients
     GET does not require authorization
     """
-    from models import Client
 
     clients = Client.load_all_dict()
     if not clients:
@@ -31,7 +31,6 @@ def get_by_id(id):
     Update and delete require the client token to exist and match that of the client id
     """
     from flask import request
-    from models import Client
     from authorization import unauthorized_message
 
     client = Client.load_by_id(id)
@@ -85,7 +84,6 @@ def create_client():
     Create a client
     """
     from flask import request
-    from models import Client
 
     name = request.form.get("name")
     if not name:
