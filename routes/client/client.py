@@ -12,6 +12,7 @@ from authorization import authorized_client
 def all_clients():
     """
     Get all clients
+    GET does not require authorization
     """
     from models import Client
 
@@ -26,6 +27,8 @@ def all_clients():
 def get_by_id(id):
     """
     Get, update, or delete a client by id
+    Get does not require authorization
+    Update and delete require the client token to exist and match that of the client id
     """
     from flask import request
     from models import Client
@@ -35,17 +38,19 @@ def get_by_id(id):
     if not client:
         return "Not found. Invalid client ID.\n", 404
 
+    # GET does not require authorization
     if request.method == "GET":
         return client.to_dict(), 200
 
+    # DELETE and PUT require authorization
     token = request.token
     if not token:
         return unauthorized_message
-
     if token != client.token:
         return unauthorized_message
 
     if request.method == "DELETE":
+
         client.delete()
         return "Client deleted", 204
 
