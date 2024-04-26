@@ -47,18 +47,23 @@ def before_request():
         request.token = None
         return
     
-    # In the future, these should be flask error handlers so I can use them consistently in the routes
+    '''
+    # These should be flask error handlers so I can use them consistently in the routes
+    # I'll leave it to the authorization wrapper to return the error message
     invalid_authorization = f"Invalid header. Usage: Authorization: Bearer <token>\nNot: {header}", 400
     invalid_token = "Invalid token\n", 401
-
+    
     # header exists but is invalid, return error so client can correct
     if not client_header_is_valid(header):
         return invalid_authorization
-    
+    '''
     # valid header but no client, return error for security
     client = client_from_header(header)
-    if not client:
-        return invalid_token
+    #if not client:
+    #    return invalid_token
 
     request.client = client
-    request.token = client.token
+    if client:
+        request.token = client.token
+    else:
+        request.token = None
