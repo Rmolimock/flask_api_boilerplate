@@ -15,11 +15,8 @@ def create_user():
     handle = request.form.get("handle")
     if not (name and handle):
         return "User name and handle are required\n", 400
-    
-    data = {
-        "name": name,
-        "handle": handle
-    }
+
+    data = {"name": name, "handle": handle}
 
     try:
         user = User(**data)
@@ -62,7 +59,7 @@ def get_by_id(id):
     user = User.load_by_id(id)
     if not user:
         return "Not found. Invalid user ID.\n", 404
-    
+
     if request.method == "GET":
         return user.to_dict(), 200
 
@@ -85,7 +82,7 @@ def get_by_id(id):
             if name_taken and name_taken.id != user.id:
                 return "User name is taken\n", 400
             user.name = name
-        
+
         if handle:
             handle_taken = User.load_by_attr("handle", handle)
             if handle_taken and handle_taken.id != user.id:

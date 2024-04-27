@@ -70,7 +70,7 @@ def get_by_id(id):
         return client.to_dict(), 200
 
 
-'''
+"""
 I've commented out the below POST route so it's disabled by default.
 Enable it if you want to create clients programmatically, but be warned that
 this will allow anyone to do so, and any client can be used to access
@@ -78,27 +78,25 @@ the rest of the API.
 
 Otherwise, use the register_client.py script to create clients.
 
-@clients_v1.route("/", methods=["POST"], strict_slashes=False)
+@clients_v1.route('/', methods=['POST'], strict_slashes=False)
 def create_client():
-    """
     Create a client
-    """
     from flask import request
 
-    name = request.form.get("name")
+    name = request.form.get('name')
     if not name:
-        return "Client name is required\n", 400
+        return 'Client name is required\n', 400
 
     try:
-        client = Client(**{"name": name})
+        client = Client(**{'name': name})
     except Exception as e:
         return str(e), 500
 
     if not client:
-        return "Failed to create client\n", 500
+        return 'Failed to create client\n', 500
 
     client_dict = client.to_dict()
     client.save()
 
     return client_dict, 201
-'''
+"""

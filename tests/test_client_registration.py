@@ -1,6 +1,7 @@
-'''
+"""
 Tests for client registration via scripts/register_client.py <client_name>
-'''
+"""
+
 from scripts.register_client import create_client
 import pytest
 
@@ -8,20 +9,22 @@ import pytest
 @pytest.fixture
 def mock_client(mocker):
     # Initialize a shared mock client for TestClientRegistration tests
-    mock_client = mocker.patch('scripts.register_client.Client')
+    mock_client = mocker.patch("scripts.register_client.Client")
     return mock_client
-    
+
+
 @pytest.fixture
 def mock_db(mocker):
     # Initialize a shared mock db session for TestClientRegistration tests
-    mock_db = mocker.patch('scripts.register_client.db.session')
+    mock_db = mocker.patch("scripts.register_client.db.session")
     return mock_db
 
 
 class TestClientRegistration:
-    '''
+    """
     Test the create_client function in scripts/register_client.py
-    '''
+    """
+
     def test_existing_client(self, mock_client, mock_db):
         # test that a client name already in use is not registered
 
@@ -39,7 +42,7 @@ class TestClientRegistration:
         mock_db.remove.assert_called()
         # assert_called_once fails due to a phantom second call to remove() that I can't find
         # so I'm using assert_called() for now
-    
+
     def test_register_client(self, mock_client):
         # test that a new client is registered when the name is unique
 
@@ -47,10 +50,10 @@ class TestClientRegistration:
         mock_client.load_by_attr.return_value = False
         mock_client.return_value.save.return_value = None
         mock_client.return_value.token = "test_token"
-    
+
         # ACTIONS
         token = create_client("test_name")
-        
+
         # ASSERTIONS
         assert token
         assert isinstance(token, str)

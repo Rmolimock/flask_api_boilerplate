@@ -22,7 +22,7 @@ class User(BaseModel):
 
         if not isinstance(name, str):
             raise TypeError("Name must be a string")
-        
+
         if not isinstance(handle, str):
             raise TypeError("Handle must be a string")
 
@@ -30,11 +30,10 @@ class User(BaseModel):
         name_taken = User.load_by_attr("name", name)
         if name_taken:
             raise ValueError("User name is taken")
-        
+
         handle_taken = User.load_by_attr("handle", handle)
         if handle_taken:
             raise ValueError("User handle is taken")
-        
 
         super(User, self).__init__(**kwargs)
 
