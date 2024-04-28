@@ -30,4 +30,5 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - DB_HOST=
 - DB_PORT=
 - FLASK_APP=main.py
+- PYTHONPATH='.'
 5. `FLASK_DEBUG=True flask run`

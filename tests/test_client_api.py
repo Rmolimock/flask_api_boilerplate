@@ -127,22 +127,30 @@ class TestClients:
         assert response.status_code == 401
         mock_client_before_request.load_by_id.assert_not_called()
 
-    """
+
     def test_authorized_put_by_id(self, api, mock_client, mock_client_before_request):
+        '''
         Test the PUT client by id endpoint with authorization
+        '''
         # MOCK VALUES
         mock_id = str(uuid4())
         mock_token = str(uuid4())
-        headers = {
-            'Authorization': f'Bearer {mock_token}'
-        }
+        headers = {'Authorization': f'Bearer {mock_token}'}
+        json = {'name': 'test_name'}
+
+        mock_client.load_by_id.return_value = mock_client
+        # before_request checks for valid client by authenticator token
+        # must be client object because it then checks client.token
         mock_client_before_request.load_by_attr.return_value = mock_client
-        mock_client.token = mock_token
+        # route checks if the proposed client name is already in use
+        mock_client.load_by_attr.return_value = False
 
         # ACTIONS
-        response = api.put(f'/v1/clients/{mock_id}', headers=headers)
+        response = api.put(f"/v1/clients/{mock_id}", headers=headers, data=json)
+        print(response.data)
 
         # ASSERTIONS
         assert response.status_code == 200
-        mock_client_before_request.load_by_id.assert_not_called()
-    """
+        mock_client.load_by_id.assert_called_once_with(mock_id)
+        mock_client_before_request.load_by_attr.assert_called_once_with('token', mock_token)
+
