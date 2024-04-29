@@ -31,4 +31,5 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - DB_PORT=
 - FLASK_APP=main.py
 - PYTHONPATH='.'
-5. `FLASK_DEBUG=True flask run`
+5. sudo apt-get install inotify-tools # for running run_pytest_on_save.sh
+6. `FLASK_DEBUG=True flask run`
