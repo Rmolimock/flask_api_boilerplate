@@ -20,9 +20,9 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - PyMySQL 1.0
 
 ## Installation
-1. `git clone https://github.com/Rmolimock/flask_api_boilerplate.git`
-2. `cd flask_api_boilerplate`
-3. `pip install -r requirements.txt`
+1. git clone https://github.com/Rmolimock/flask_api_boilerplate.git
+2. cd flask_api_boilerplate
+3. pip install -r requirements.txt
 4. Create a .env file with the following contents:
 - DB_NAME=
 - DB_USER=
@@ -32,4 +32,12 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - FLASK_APP=main.py
 - PYTHONPATH='.'
 5. sudo apt-get install inotify-tools # for running run_pytest_on_save.sh
-6. `FLASK_DEBUG=True flask run`
+6. chmod +x run_pytest_on_save.sh
+7. sudo apt install zenity # for running run_pytest_on_save.sh
+8. ./run_pytest_on_save.sh # in a separate terminal
+9. flask db init # if you don't have migrations folder, alembic.ini, or env.py yet
+10. flask db migrate
+11. flask db upgrade
+12. sudo apt-get install mysql-server # if you don't have MySQL installed
+13. mysql -u root -p # log in to MySQL in another terminal
+14. FLASK_DEBUG=True flask run
