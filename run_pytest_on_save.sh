@@ -7,7 +7,7 @@ DIRECTORY_TO_WATCH="."
 COMMAND="pytest"
 
 # Exclude directories or files
-EXCLUDE='(\.pytest_cache|__pycache__|\.pyc|\.log$)'
+EXCLUDE='(\.pytest_cache|__pycache__|\.pyc|\.log$)|./.venv'
 
 echo "Starting to monitor changes in $DIRECTORY_TO_WATCH for running $COMMAND..."
 
