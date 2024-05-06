@@ -9,7 +9,10 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - [X] Automatically create tables in the database for client models
 - [X] Flask-Migrate for database version control
 - [X] CRUD routes for clients and users
-- [ ] Pytests for all of the above
+- [ ] Pytests for clients
+- [ ] Pytests for users
+- [ ] Pytests for shared methods
+- [ ] Make pytests scalable with TestBase
 
 ## Requirements
 - Python 3.10
