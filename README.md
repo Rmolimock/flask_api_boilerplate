@@ -14,6 +14,7 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - [ ] Pytests for shared methods
 - [ ] Make pytests scalable with TestBase
 
+
 ## Requirements
 - Python 3.10
 - MySQL 8.0
