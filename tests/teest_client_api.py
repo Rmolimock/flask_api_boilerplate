@@ -7,9 +7,6 @@ from main import app
 from uuid import uuid4
 
 
-
-
-
 @pytest.fixture()
 def mock_client(mocker):
     # Initialize a shared mock client for TestClients tests

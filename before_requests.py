@@ -17,10 +17,10 @@ def client_header(request):
 
 
 def client_header_is_valid(header):
-    '''
+    """
     Check if the Authorization header is valid.
     Return: True if valid, else False.
-    '''
+    """
 
     return isinstance(header, str) and len(header) > 7 and header.startswith("Bearer ")
 

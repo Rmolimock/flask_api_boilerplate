@@ -42,28 +42,28 @@ class BaseModel(db.Model):
         """
         Load all the objects from the database
         """
-        return cls.query.all()
+        return db.session.query(cls).all()
 
     @classmethod
     def load_all_dict(cls):
         """
         Load all the objects from the database
         """
-        return [obj.to_dict() for obj in cls.query.all()]
+        return [obj.to_dict() for obj in cls.load_all()]
 
     @classmethod
     def load_by_id(cls, id):
         """
         Load an object by its id
         """
-        return cls.query.get(id)
+        return db.session.get(cls, id)
 
     @classmethod
     def load_by_attr(cls, attr, value):
         """
         Load an object by an attribute and its value
         """
-        return cls.query.filter(getattr(cls, attr) == value).first()
+        return db.session.query(cls).filter(getattr(cls, attr) == value).first()
 
     def to_dict(self):
         """
