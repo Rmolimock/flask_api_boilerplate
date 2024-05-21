@@ -4,7 +4,7 @@ Flask-Migrate==4.0.7
 SQLAlchemy==2.0.29
 Flask-SQLAlchemy==3.1.1
 PyMySQL==1.1.0
-pytest==8.1.1
+pytest==6.2.5
 python-dotenv==0.19.2
 black==24.4.0
 pytest-mock==3.14.0

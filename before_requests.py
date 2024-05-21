@@ -8,22 +8,34 @@ from models.client_model import Client
 
 
 def client_header(request):
-    # check for an Authorization header
+    """
+    Retrieve the Authorization header from the flask request
+    Return: Authorization header string if it exists, else None.
+    """
 
     return request.headers.get("Authorization")
 
 
 def client_header_is_valid(header):
-    # check for an invalid Authorization header
+    '''
+    Check if the Authorization header is valid.
+    Return: True if valid, else False.
+    '''
 
     return isinstance(header, str) and len(header) > 7 and header.startswith("Bearer ")
 
 
 def client_from_header(header):
     """
-    Use client authorization header token to get client object.
-    Use client_header_is_valid(header) prior to calling this function.
+    Extract the client token from the header.
+    Return: Client object if token is valid, else None.
     """
+
+    # this check is redundant in the context of the before_request function
+    # but necessary if ever used in a different context
+    if not client_header_is_valid(header):
+        return None
+
     # extract token from Authorization header
     token = header[7:]
 
@@ -34,7 +46,8 @@ def client_from_header(header):
 @app.before_request
 def before_request():
     """
-    Set client and authorization token from the Authorization header, else None.
+    Set client and authorization token from the Authorization header if present and valid, else None.
+    Return: N/A
     """
     from flask import request
 
@@ -60,6 +73,7 @@ def before_request():
     client = client_from_header(header)
     # if not client:
     #    return invalid_token
+    # in the future generate a warning that does not affect the response somehow
 
     request.client = client
     if client:
