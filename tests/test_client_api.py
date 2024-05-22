@@ -12,11 +12,14 @@ class TestClients:
         # ASSERTIONS
         assert response.status_code == 200
 
-    def test_by_id(self, api, authorization):
+    def test_by_id(self, api, method, id, authorization):
         # MOCK VALUES
         headers = {"Authorization": authorization} if authorization else {}
         # ACTIONS
-        id = str(uuid4())
-        response = api.get("/v1/clients/{id}", headers=headers)
+        request = getattr(api, method)
+        response = request("/v1/clients/{id}", headers=headers)
         # ASSERTIONS
-        assert response.status_code == 404
+        if method == "post":
+            assert response.status_code == 405
+        else:
+            assert response.status_code == 404
