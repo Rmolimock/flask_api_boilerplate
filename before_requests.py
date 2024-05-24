@@ -17,24 +17,19 @@ def client_header(request):
 
 
 def client_header_is_valid(header):
-    """
+    '''
     Check if the Authorization header is valid.
     Return: True if valid, else False.
-    """
+    '''
 
     return isinstance(header, str) and len(header) > 7 and header.startswith("Bearer ")
 
 
-def client_from_header(header):
+def authorized_client(header):
     """
     Extract the client token from the header.
     Return: Client object if token is valid, else None.
     """
-
-    # this check is redundant in the context of the before_request function
-    # but necessary if ever used in a different context
-    if not client_header_is_valid(header):
-        return None
 
     # extract token from Authorization header
     token = header[7:]
@@ -70,7 +65,7 @@ def before_request():
         return invalid_authorization
     """
     # valid header but no client, return error for security
-    client = client_from_header(header)
+    client = authorized_client(header)
     # if not client:
     #    return invalid_token
     # in the future generate a warning that does not affect the response somehow

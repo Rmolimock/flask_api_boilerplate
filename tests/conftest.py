@@ -48,19 +48,28 @@ def api(test_app):
 
 
 @pytest.fixture(params=[True, False])
-def authorization(request):
+def authorization(request, mocker):
     if request.param:
+        mock_authorized_client = mocker.patch("before_requests.authorized_client")
+        mock_client = mocker.MagicMock()
+        mock_authorized_client.return_value = mock_client
         yield f"Bearer: {str(uuid4())}"
     else:
         yield None
+    # maybe authorization fixture should return a dictionary of the token and the mock of authorized_client so I stop getting confused about where what is mocked/returned
 
 @pytest.fixture(params=['GET', 'POST', 'PUT', 'DELETE'])
 def method(request):
     return request.param.lower()
 
-@pytest.fixture(params=[None, str(uuid4())])
-def id(request):
-    return request.param
+@pytest.fixture(params=[True, False])
+def mock_client_before_request(request, mocker):
+    if request.param:
+        mock_client = mocker.patch("before_requests.Client")
+        mock_client.load_by_attr.return_value = mock_client
+        return mock_client
+    else:
+        return None
 
 
 
