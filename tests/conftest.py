@@ -57,6 +57,7 @@ def authorization(request, mocker):
     else:
         yield None
     # maybe authorization fixture should return a dictionary of the token and the mock of authorized_client so I stop getting confused about where what is mocked/returned
+    # and that would allow some dependency injection for the mock return values, if they're affected by other fixture parameters
 
 @pytest.fixture(params=['GET', 'POST', 'PUT', 'DELETE'])
 def method(request):
