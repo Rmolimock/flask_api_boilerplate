@@ -53,7 +53,11 @@ def authorization(request, mocker):
         mock_authorized_client = mocker.patch("before_requests.authorized_client")
         mock_client = mocker.MagicMock()
         mock_authorized_client.return_value = mock_client
-        yield f"Bearer: {str(uuid4())}"
+        authorization_fixture = {
+            "header": f"Bearer: {str(uuid4())}",
+            "client": mock_client
+        }
+        yield authorization_fixture
     else:
         yield None
     # maybe authorization fixture should return a dictionary of the token and the mock of authorized_client so I stop getting confused about where what is mocked/returned
