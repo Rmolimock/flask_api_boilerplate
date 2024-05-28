@@ -25,7 +25,7 @@ def client_header_is_valid(header):
     return isinstance(header, str) and len(header) > 7 and header.startswith("Bearer ")
 
 
-def authorized_client(header):
+def is_authorized(header):
     """
     Extract the client token from the header.
     Return: Client object if token is valid, else None.
@@ -65,7 +65,7 @@ def before_request():
         return invalid_authorization
     """
     # valid header but no client, return error for security
-    client = authorized_client(header)
+    client = is_authorized(header)
     # if not client:
     #    return invalid_token
     # in the future generate a warning that does not affect the response somehow

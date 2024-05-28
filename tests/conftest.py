@@ -49,17 +49,24 @@ def api(test_app):
 
 @pytest.fixture(params=[True, False])
 def authorization(request, mocker):
+    # if this is an authorized request: 1. the function that checks for a valid client should return a valid client
+    # 2. the Client.load_by_id in the route should return a client. The former is validating the request is being made BY a valid client,
+    # and the latter is validating the request is being made FOR a valid client. Actually that
+    # mock should be in the tests themselves, because not all tests are going to be about the client.
+    authorization_fixture = {}
+    # mock the function that checks for a valid client either way, so I can also assert not called if no header
+    mock_is_authorized = mocker.patch("before_requests.is_authorized")
+    mock_client = mocker.MagicMock()
+    authorization_fixture["is_authorized"] = mock_is_authorized
     if request.param:
-        mock_authorized_client = mocker.patch("before_requests.authorized_client")
-        mock_client = mocker.MagicMock()
-        mock_authorized_client.return_value = mock_client
-        authorization_fixture = {
-            "header": f"Bearer: {str(uuid4())}",
-            "client": mock_client
-        }
+        # if authorized, mock the return of the function that checks if the request's header matches a client
+        mock_is_authorized.return_value = mock_client
+        authorization_fixture["header"] = f"Bearer: {str(uuid4())}"
         yield authorization_fixture
     else:
-        yield None
+        mock_is_authorized.return_value = None
+        authorization_fixture["header"] = None
+        yield authorization_fixture
     # maybe authorization fixture should return a dictionary of the token and the mock of authorized_client so I stop getting confused about where what is mocked/returned
     # and that would allow some dependency injection for the mock return values, if they're affected by other fixture parameters
 
