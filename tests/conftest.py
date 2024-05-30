@@ -74,14 +74,11 @@ def authorization(request, mocker):
 def method(request):
     return request.param.lower()
 
-@pytest.fixture(params=[True, False])
-def mock_client_before_request(request, mocker):
-    if request.param:
-        mock_client = mocker.patch("before_requests.Client")
-        mock_client.load_by_attr.return_value = mock_client
-        return mock_client
-    else:
-        return None
+@pytest.fixture()
+def mock_client_route(mocker):
+    mock_client = mocker.patch("routes.client.client.Client")
+    mock_client.load_by_id.return_value = mock_client
+    return mock_client
 
 
 
