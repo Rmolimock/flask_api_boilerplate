@@ -74,11 +74,24 @@ def authorization(request, mocker):
 def method(request):
     return request.param.lower()
 
-@pytest.fixture()
-def mock_client_route(mocker):
+@pytest.fixture(params=[True, False, None])
+def mock_client_route(request, mocker, authorization):
     mock_client = mocker.patch("routes.client.client.Client")
-    mock_client.load_by_id.return_value = mock_client
-    return mock_client
+    if authorization.get("header"):
+        if request.param:
+            mock_client.load_by_id.return_value = mock_client
+        elif request.param is False:
+            mock_client.load_by_id.return_value = None
+        elif request.param is None:
+            mock_client.load_by_id.return_value = None
+            # sometimes mock_client will have a token that matches the token used in the request
+            # and sometimes it will be None. But I have to know the token sent in the request
+            # I don't know how to use info in a test function to parameterize a fixture which in turn is used in that very test function
+            # I think I need to make a fixture that returns a function that makes requests to the API
+            # or find a completely different way to go about it. Maybe I can declare the token only in here instead of the test function?
+        return mock_client
+    else:
+        return None
 
 
 
