@@ -47,6 +47,28 @@ def api(test_app):
     return test_app.test_client()
 
 
+@pytest.fixture(params=['GET', 'POST', 'PUT', 'DELETE'])
+def method(request):
+    return request.param.lower()
+
+
+@pytest.fixture(params=[True, False])
+def client_exists(request, mocker, authorization):
+    mock_client_class = mocker.patch("routes.client.client.Client")
+    if authorization:
+        # come back to this
+        mock_client = mocker.MagicMock()
+        mock_client_class.load_by_id.return_value = mock_client
+        mock_client.id = str(uuid4())
+        return mock_client
+    else:
+        return None
+
+
+
+
+
+'''
 @pytest.fixture(params=[True, False])
 def authorization(request, mocker):
     # if this is an authorized request: 1. the function that checks for a valid client should return a valid client
@@ -70,9 +92,7 @@ def authorization(request, mocker):
     # maybe authorization fixture should return a dictionary of the token and the mock of authorized_client so I stop getting confused about where what is mocked/returned
     # and that would allow some dependency injection for the mock return values, if they're affected by other fixture parameters
 
-@pytest.fixture(params=['GET', 'POST', 'PUT', 'DELETE'])
-def method(request):
-    return request.param.lower()
+
 
 @pytest.fixture(params=[True, False, None])
 def mock_client_route(request, mocker, authorization):
@@ -99,3 +119,6 @@ def mock_client_route(request, mocker, authorization):
 # but then these parameters all need to influence which functions get mocked and how
 # I'm not sure how to do that. Maybe a parent fixture w/ parameters that calls the others?
 # like a scenarios fixture which has a dict of all the combos and then pass that into the authorization, id, and method fixtures
+
+
+'''
