@@ -24,6 +24,7 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - PyMySQL 1.0
 
 ## Installation
+### Clone the repo, install requirements, and create a .env file
 1. git clone https://github.com/Rmolimock/flask_api_boilerplate.git
 2. cd flask_api_boilerplate
 3. pip install -r requirements.txt
@@ -35,13 +36,28 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 - DB_PORT=
 - FLASK_APP=main.py
 - PYTHONPATH='.'
+### Optionally setup a test error alert window
 5. sudo apt-get install inotify-tools # for running run_pytest_on_save.sh
-6. chmod +x run_pytest_on_save.sh
-7. sudo apt install zenity # for running run_pytest_on_save.sh
+6. sudo apt install zenity # for running run_pytest_on_save.sh
+7. chmod +x run_pytest_on_save.sh
 8. ./run_pytest_on_save.sh # in a separate terminal
-9. flask db init # if you don't have migrations folder, alembic.ini, or env.py yet
-10. flask db migrate
-11. flask db upgrade
-12. sudo apt-get install mysql-server # if you don't have MySQL installed
-13. mysql -u root -p # log in to MySQL in another terminal
+
+### Install MySQL
+9. sudo apt-get install mysql-server # if you don't have MySQL installed
+10. mysql -u root -p # log into MySQL in another terminal, using the user and password you provided in the .env file
+### Setup database version control
+11. flask db init # if you don't have migrations folder, alembic.ini, or env.py yet
+12. flask db migrate
+13. flask db upgrade
+### Run the app
 14. FLASK_DEBUG=True flask run
+
+
+
+
+
+# temp to do list
+- [ ] delete authorization, before_request, and test files
+- [ ] create tests for authorization (which includes before_request functionality) prior to recreating it
+- [ ] allow tests to inform the structure of the flow of authorization
+- [ ] then parameterize the tests for different scenarios

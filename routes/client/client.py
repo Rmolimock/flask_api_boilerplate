@@ -6,7 +6,7 @@ GET, DELETE, PUT client by id
 
 from models import Client
 from routes.client import clients_v1
-from authorization import authorized_client
+# from temp_replace.authorization import authorized_client
 
 
 @clients_v1.route("/", methods=["GET"], strict_slashes=False)
@@ -31,7 +31,7 @@ def get_by_id(id):
     Update and delete require the client token to exist and match that of the client id
     """
     from flask import request
-    from authorization import unauthorized_message
+    from temp_replace.authorization import unauthorized_message
 
     client = Client.load_by_id(id)
     if not client:
