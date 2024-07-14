@@ -8,7 +8,10 @@ import pytest
 from uuid import uuid4
 
 
-# BASICS, App and API =========================================================
+# =============================================================================
+# Basics, App and API =========================================================
+# =============================================================================
+
 
 @pytest.fixture()
 def test_app():
@@ -28,7 +31,10 @@ def api(test_app):
     return test_app.test_client()
 
 
-# SIMPLE mock values for fixtures =============================================
+# =============================================================================
+# Simple mock values for fixtures =============================================
+# =============================================================================
+
 
 pytest.fixture()
 def mock_id():
@@ -39,7 +45,10 @@ def authentication_token():
     return str(uuid4())
 
 
+# =============================================================================
 # Helper functions for fixtures ===============================================
+# =============================================================================
+
 
 @pytest.fixture()
 def get_mock_class(mocker):
@@ -75,65 +84,16 @@ def get_mock_object(mocker):
         return mock_obj
     return mock_object
 
-
-# Parameterized fixtures ======================================================
-
-@pytest.fixture(params=["get", "post", "put", "delete"])
-def method(request):
-    """
-    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
-    should be tested separately, not parameterized.
-    """
-    return request.param
-
-@pytest.fixture(params=["get", "put", "delete"])
-def method_no_post(request):
-    """
-    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
-    should be tested separately, not parameterized.
-    """
-    return request.param
-
-@pytest.fixture(params=[True, False])
-def has_valid_id(request, mocker, get_mock_class, get_mock_object):
-
-    def is_valid_id(mock_class_path):
-        """
-        Simulate loading an object from the db with a valid ID. Mock it's
-        class to return a mock object when using load_by_id, which has an
-        id equal to the string returned by this function, which should be
-        used within test functions for requests by id in the route arg of
-        make_authenticated_request().
-        """
-        if request.param:
-            obj_id = str(uuid4())
-            mock_class = get_mock_class(mock_class_path)
-            mock_obj = get_mock_object(mock_class, obj_id)
-            return obj_id
-        else:
-            return None
-            
-    return is_valid_id
-
-'''
-parameterize this to have authorization token or not
-then use get_mock_class with the route for the client inside before_request
-and in here, make it return a magic mock obj with a token that matches the token
-or not depending on the request.param. Then anytime a request is sent within a test,
-it will do two requests, one with a token and mocked client with the correct client.token
-and one with no token sent and a mocked client class that does not return a client object at all.
-'''
-
-@pytest.fixture(params=[True, False])
-def authorized(request):
-    """
-    Parameterize authorization helper for make_requests. This must be separate in order
-    to check the conditional "if authorized" inside tests, for assertions dependent on that.
-    """
-    return request.param
-
 @pytest.fixture()
 def make_request(api, get_mock_class, authentication_token, authorized):
+    '''
+    parameterize this to have authorization token or not
+    then use get_mock_class with the route for the client inside before_request
+    and in here, make it return a magic mock obj with a token that matches the token
+    or not depending on the request.param. Then anytime a request is sent within a test,
+    it will do two requests, one with a token and mocked client with the correct client.token
+    and one with no token sent and a mocked client class that does not return a client object at all.
+    '''
     """
     Return a function that can make requests to the API. Optionally includes an authorization header.
     """
@@ -167,9 +127,57 @@ def make_request(api, get_mock_class, authentication_token, authorized):
             mock_client = get_mock_object(before_client_class, **attrs)
 
         method_func = getattr(api, method)
-        print(headers, "********** * ************* ********")
         return method_func(route, headers=headers, json=data)
 
     return request_func
 
 
+# =============================================================================
+# Parameterized fixtures ======================================================
+# =============================================================================
+
+
+@pytest.fixture(params=["get", "post", "put", "delete"])
+def method(request):
+    """
+    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
+    should be tested separately, not parameterized.
+    """
+    return request.param
+
+@pytest.fixture(params=["get", "put", "delete"])
+def method_no_post(request):
+    """
+    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
+    should be tested separately, not parameterized.
+    """
+    return request.param
+
+@pytest.fixture(params=[True, False])
+def authorized(request):
+    """
+    Parameterize authorization helper for make_requests. This must be separate in order
+    to check the conditional "if authorized" inside tests, for assertions dependent on that.
+    """
+    return request.param
+
+@pytest.fixture(params=[True, False])
+def has_valid_id(request, mocker, get_mock_class, get_mock_object):
+
+    def is_valid_id(mock_class_path):
+        """
+        Simulate loading an object from the db with a valid ID. Mock it's
+        class to return a mock object when using load_by_id, which has an
+        id equal to the string returned by this function, which should be
+        used within test functions for requests by id in the route arg of
+        make_authenticated_request().
+        """
+        if request.param:
+            obj_id = str(uuid4())
+            mock_class = get_mock_class(mock_class_path)
+            mock_obj = get_mock_object(mock_class, obj_id)
+            return obj_id
+        else:
+            return None
+            
+    return is_valid_id
