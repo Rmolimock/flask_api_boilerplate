@@ -42,6 +42,8 @@ def get_by_id(id):
         return client.to_dict(), 200
 
     # DELETE and PUT require authorization
+    if not hasattr(request, "token"):
+        return unauthorized_message
     token = request.token
     if not token:
         return unauthorized_message
