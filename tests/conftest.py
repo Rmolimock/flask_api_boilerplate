@@ -41,7 +41,7 @@ def mock_id():
     return str(uuid4())
 
 @pytest.fixture()
-def authentication_token():
+def authorization_token():
     return str(uuid4())
 
 
@@ -62,12 +62,12 @@ def get_mock_class(mocker):
 @pytest.fixture()
 def get_mock_object(mocker):
     """
-        A function to mock a client object from a given class, mock the class'
+        A function to mock a client object from a given class, mock the class' 
         load_by_id method to return it, and set the object's attributes to the
         values with kwargs. Set id if obj_id present.
         Return: mock object function
-        """
-    def mock_object(mock_class, obj_id=None, **kwargs):
+    """
+    def mock_object_func(mock_class, obj_id=None, **kwargs):
         """
         Mock a client object from a given class, mock the class' load_by_id
         method to return it, and set the object's attributes to the values
@@ -81,11 +81,13 @@ def get_mock_object(mocker):
         for key, value in kwargs.items():
             setattr(mock_obj, key, value)
             mock_class.load_by_attr.return_value = mock_obj
+            # am I mocking this correctly? alternate:
+            mock_class.load_by_attr = mock_obj
         return mock_obj
-    return mock_object
+    return mock_object_func
 
 @pytest.fixture()
-def make_request(api, get_mock_class, authentication_token, authorized):
+def make_request(api, get_mock_class, get_mock_object):
     '''
     parameterize this to have authorization token or not
     then use get_mock_class with the route for the client inside before_request
@@ -115,16 +117,17 @@ def make_request(api, get_mock_class, authentication_token, authorized):
             raise TypeError("Data must be a dictionary")
 
         headers = {}
-        if authorized:
+        '''if authorized:
             # will I need access to the token in the test function?
             # I'll need it here to mock a response, and I'll want it in the test
             # function so I can assert that the client was loaded with the correct token
-            headers["Authorization"] = f"Bearer {authentication_token}"
+            headers["Authorization"] = f"Bearer {authorization_token}"
             before_client_class = get_mock_class("before_requests.Client")
             attrs = {
-                'token': authentication_token,
+                'token': authorization_token,
             }
             mock_client = get_mock_object(before_client_class, **attrs)
+        '''
 
         method_func = getattr(api, method)
         return method_func(route, headers=headers, json=data)
