@@ -50,52 +50,51 @@ def authorization_token():
 # =============================================================================
 
 
-@pytest.fixture()
-def get_mock_class(mocker):
-    def mock_class(mock_class_path):
-        """
-        Mock a class and return the class object.
-        """
-        return mocker.patch(mock_class_path)
-    return mock_class
+def load_mock_obj_by_attrs(mock_class, **kwargs):
+    from unittest.mock import MagicMock
+    mock_obj = MagicMock()
+
+    for key, value in kwargs.items():
+        setattr(mock_obj, key, value)
+        mock_class.load_by_attr.return_value = mock_obj
+        mock_class.load_by_attr = mock_obj
+    return mock_obj
+
+def load_mock_obj_by_id(mock_class, id):
+    from unittest.mock import MagicMock
+    mock_obj = MagicMock()
+    mock_obj.id = id
+    mock_class.load_by_id.return_value = mock_obj
+    mock_class.load_by_id = mock_obj
+    return mock_obj
+
+# =============================================================================
+# Parameterized fixtures ======================================================
+# =============================================================================
+
+
+@pytest.fixture(params=["get", "post", "put", "delete"])
+def method(request):
+    """
+    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
+    should be tested separately, not parameterized.
+    """
+    return request.param
+
+@pytest.fixture(params=["get", "put", "delete"])
+def method_no_post(request):
+    """
+    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
+    should be tested separately, not parameterized.
+    """
+    return request.param
+
+@pytest.fixture(params=[True, False])
+def is_valid_id(request):
+    return str(uuid4()) if request.param else None
 
 @pytest.fixture()
-def get_mock_object(mocker):
-    """
-        A function to mock a client object from a given class, mock the class' 
-        load_by_id method to return it, and set the object's attributes to the
-        values with kwargs. Set id if obj_id present.
-        Return: mock object function
-    """
-    def mock_object_func(mock_class, obj_id=None, **kwargs):
-        """
-        Mock a client object from a given class, mock the class' load_by_id
-        method to return it, and set the object's attributes to the values
-        with kwargs. Set id if obj_id present.
-        Return: mock object
-        """
-        mock_obj = mocker.MagicMock()
-        mock_class.load_by_id.return_value = mock_obj
-        if obj_id:
-            mock_obj.id = obj_id
-        for key, value in kwargs.items():
-            setattr(mock_obj, key, value)
-            mock_class.load_by_attr.return_value = mock_obj
-            # am I mocking this correctly? alternate:
-            mock_class.load_by_attr = mock_obj
-        return mock_obj
-    return mock_object_func
-
-@pytest.fixture()
-def make_request(api, get_mock_class, get_mock_object):
-    '''
-    parameterize this to have authorization token or not
-    then use get_mock_class with the route for the client inside before_request
-    and in here, make it return a magic mock obj with a token that matches the token
-    or not depending on the request.param. Then anytime a request is sent within a test,
-    it will do two requests, one with a token and mocked client with the correct client.token
-    and one with no token sent and a mocked client class that does not return a client object at all.
-    '''
+def make_request(api):
     """
     Return a function that can make requests to the API. Optionally includes an authorization header.
     """
@@ -134,39 +133,22 @@ def make_request(api, get_mock_class, get_mock_object):
 
     return request_func
 
+@pytest.fixture()
+def mock_obj_if_valid_id(is_valid_id):
+    def func(mock_class):
+        if is_valid_id:
+            return load_mock_obj_by_id(mock_class, is_valid_id)
+        else:
+            return None
+    return func
 
-# =============================================================================
-# Parameterized fixtures ======================================================
-# =============================================================================
 
 
-@pytest.fixture(params=["get", "post", "put", "delete"])
-def method(request):
-    """
-    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
-    should be tested separately, not parameterized.
-    """
-    return request.param
 
-@pytest.fixture(params=["get", "put", "delete"])
-def method_no_post(request):
-    """
-    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
-    should be tested separately, not parameterized.
-    """
-    return request.param
 
-@pytest.fixture(params=[True, False])
-def authorized(request):
-    """
-    Parameterize authorization helper for make_requests. This must be separate in order
-    to check the conditional "if authorized" inside tests, for assertions dependent on that.
-    """
-    return request.param
 
-@pytest.fixture(params=[True, False])
-def has_valid_id(request, mocker, get_mock_class, get_mock_object):
 
+'''
     def is_valid_id(mock_class_path):
         """
         Simulate loading an object from the db with a valid ID. Mock it's
@@ -184,3 +166,4 @@ def has_valid_id(request, mocker, get_mock_class, get_mock_object):
             return None
             
     return is_valid_id
+'''
