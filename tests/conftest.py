@@ -79,7 +79,6 @@ def mock_obj_if_authorized(mocker, is_authorized):
             mock_obj.token = is_authorized
             mock_class.load_by_attr.return_value = mock_obj
             mock_obj.to_dict = mocker.MagicMock(return_value={"token": is_authorized})
-            print(mock_obj.token, 'in conftest')
             return mock_obj
         else:
             return None
@@ -92,7 +91,7 @@ def make_request(api):
     Return a function that can make requests to the API. Optionally includes an authorization header.
     """
 
-    def request_func(method, route, is_authorized=None, data=None):
+    def request_func(method, route, is_authorized=None, data={}):
         """
         Simulate making a request to the API with the Authorization header present only when token is present.
         """
@@ -159,4 +158,9 @@ def is_valid_id(request):
 @pytest.fixture(params=[True, False])
 def is_authorized(request):
     return str(uuid4()) if request.param else None
+
+@pytest.fixture(params=[True, False])
+def is_valid_data(request):
+    return {"name": str(uuid4())} if request.param else {}
+
 
