@@ -1,11 +1,10 @@
 from uuid import uuid4
 import pytest
 from unittest.mock import patch
-from flask import request
 
 
 def test_client_method(
-    mocker, is_valid_id, method_no_post, is_authorized, is_valid_data, mock_obj_if_valid_id, make_request, mock_obj_if_authorized, test_app
+    mocker, is_valid_id, method_no_post, is_authorized, is_valid_data, mock_obj_if_valid_id, make_request, mock_obj_if_authorized
 ):
     method = method_no_post
 
@@ -43,37 +42,49 @@ def test_client_method(
     #        authorization token in before_requests.py
     # [X] 1. client.token matches is_authorized
     # [X] 2. client is returned by Client.load_by_attr(token) if is_authorized
-    
+
     client_class_before_request = mocker.patch("before_requests.Client")
     client_instance_before_request = mock_obj_if_authorized(client_class_before_request)
     data = {'name': str(uuid4())} if method == 'put' else {}
-    
-    with test_app.request_context(f"/v1/clients/{is_valid_id}"):
-        request.form.get.return_value = 'someName'
-        request.token = is_authorized
 
-        # ACTION
-        # mock route client to have load_by_attr with name return None
-        # mock route request to have .form.get('name') not None and .token
-        response = make_request(method, f"/v1/clients/{client_id}", is_authorized, data)
+    # C. [ ] Mocking the in-route authentication for PUT and DELETE ===========
+    # [ ] 1. request.token can not be easily mocked due to request context complications. Must
+    #        mock a helper function (get_request_token) that returns it instead. (authenticates in-route rather
+    #        than in a wrapper function because the route is shared with GET which is public)
+    # [ ] 2. request.form.get('name') must be mocked via a helper function also. (validates
+    #        there's no existing client with new name already)
 
-        # ASSERTIONS
-        if method == "get":
+    # C.1 MOCK get_request_token from routes/client/client.py
+    mock_get_request_token = mocker.patch("routes.client.client.get_request_token")
+    mock_get_request_token.return_value = is_authorized
 
-            assert response.status_code == 200 if is_valid_id else 404
-            client_class_in_route.load_by_id.assert_called_once_with(client_id)
-            client_instance_in_route.to_dict.assert_called_once() if is_valid_id else None
+    # C.2 MOCK get_request_form_attr from routes/client/client.py
+    mock_get_request_form_attr = mocker.patch("routes.client.client.get_request_form_attr")
+    mock_get_request_form_attr.return_value = data.get("name")
 
-        elif method == "put":
-            assert response.status_code == 200 if is_valid_id and is_authorized else 401
+    # ACTION
+    response = make_request(method, f"/v1/clients/{client_id}", is_authorized, data)
 
-        elif method == "delete" and is_valid_id and is_authorized:
-            assert response.status_code == 204
+    # ASSERTIONS
+    if method == "get":
 
-        else:
-            assert response.status_code == 401
-
+        assert response.status_code == 200 if is_valid_id else 404
         client_class_in_route.load_by_id.assert_called_once_with(client_id)
+        client_instance_in_route.to_dict.assert_called_once() if is_valid_id else None
+
+    elif method == "put":
+        if is_valid_data:
+            assert response.status_code == 200 if is_valid_id and is_authorized else 401
+        else:
+            assert response.status_code == 400 if is_valid_id and is_authorized else 401
+
+    elif method == "delete" and is_valid_id and is_authorized:
+        assert response.status_code == 204
+
+    else:
+        assert response.status_code == 401
+
+    client_class_in_route.load_by_id.assert_called_once_with(client_id)
 
 
 """
