@@ -1,25 +1,47 @@
 from main import app
 from models import Client
+from authorization import get_request_token
+
+
+def get_authorization_token(request):
+    token = request.headers.get("Authorization")
+    if not token or len(token) < 8:
+        return None
+
+    return token[7:]
+
+
+def set_request_token(token):
+    from flask import request
+
+    request.token = token
+    if not token:
+        request.client = None
+
+    return
+
+
+def set_request_client(client):
+    from flask import request
+
+    request.client = client
+    if not client:
+        request.token = None
+
+    return
+
 
 @app.before_request
 def before_request():
-    # check if request has Authorization header
-    # if it does, check if the token matches a valid client
-    # if it does, set the request's client and token attributes
-    # if not, set them to None
     from flask import request
 
-    token = request.headers.get("Authorization")
+    token = get_authorization_token(request)
+
+    set_request_token(token)
+
     if not token:
-        request.client = None
-        request.token = None
         return
-    
+
     client = Client.load_by_attr("token", token)
-    if not client:
-        request.client = None
-        request.token = None
-        return
-    
-    request.client = client
-    request.token = token
+
+    set_request_client(client)

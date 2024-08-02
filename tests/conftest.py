@@ -1,9 +1,3 @@
-# if authorization header is present and valid in a request
-# then flask's request object will have a token attribute
-# and the models.Client.load_by_attr("token", token) method
-# will return a mock client object with the token attribute
-# and the id matching the mocked client id
-
 import pytest
 from uuid import uuid4
 
@@ -23,6 +17,7 @@ def test_app():
 
     # CLEAN UP
     yield app
+
 
 @pytest.fixture()
 def api(test_app):
@@ -60,6 +55,7 @@ def load_mock_obj_by_id(mock_class, id):
     mock_class.load_by_id.return_value = mock_obj
     return mock_obj
 
+
 @pytest.fixture()
 def mock_obj_if_valid_id(is_valid_id):
     def func(mock_class):
@@ -70,8 +66,10 @@ def mock_obj_if_valid_id(is_valid_id):
 
     return func
 
+
 @pytest.fixture()
 def mock_obj_if_authorized(mocker, is_authorized):
+    # TODO clean up this function
     def func(mock_class):
         if is_authorized:
             # mock object instance, make class return it by .token, make instance.to_dict return dict of attrs
@@ -84,6 +82,7 @@ def mock_obj_if_authorized(mocker, is_authorized):
             return None
 
     return func
+
 
 @pytest.fixture()
 def make_request(api):
@@ -108,17 +107,7 @@ def make_request(api):
             raise TypeError("Data must be a dictionary")
 
         headers = {}
-        """if authorized:
-            # will I need access to the token in the test function?
-            # I'll need it here to mock a response, and I'll want it in the test
-            # function so I can assert that the client was loaded with the correct token
-            headers["Authorization"] = f"Bearer {authorization_token}"
-            before_client_class = get_mock_class("before_requests.Client")
-            attrs = {
-                'token': authorization_token,
-            }
-            mock_client = get_mock_object(before_client_class, **attrs)
-        """
+
         if is_authorized:
             headers["Authorization"] = f"Bearer {is_authorized}"
 
@@ -150,6 +139,7 @@ def method_no_post(request):
     """
     return request.param
 
+
 @pytest.fixture(params=["get", "put-valid", "put-invalid", "delete"])
 def method_no_post_put_data(request):
     """
@@ -163,12 +153,12 @@ def method_no_post_put_data(request):
 def is_valid_id(request):
     return str(uuid4()) if request.param else None
 
+
 @pytest.fixture(params=[True, False])
 def is_authorized(request):
     return str(uuid4()) if request.param else None
 
+
 @pytest.fixture(params=[True, False])
 def is_valid_data(request):
     return {"name": str(uuid4())} if request.param else {}
-
-

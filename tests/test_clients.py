@@ -1,6 +1,7 @@
 from uuid import uuid4
 import pytest
 from unittest.mock import patch
+from flask import request
 
 
 def test_client_method(
@@ -63,7 +64,7 @@ def test_client_method(
 
     # C.1 MOCK get_request_token from routes/client/client.py
     mock_get_request_token = mocker.patch("routes.client.client.get_request_token")
-    mock_get_request_token.return_value = is_authorized
+    mock_get_request_token.return_value = is_authorized # TODO assert this is done correctly in the right context. Also make sure all my mocks correspond to an assertion.
 
     # C.2 MOCK get_request_form_attr from routes/client/client.py
     mock_get_request_form_attr = mocker.patch("routes.client.client.get_request_form_attr")
@@ -73,8 +74,14 @@ def test_client_method(
     response = make_request(method, f"/v1/clients/{client_id}", is_authorized, data)
 
     # ASSERTIONS
-    if method == "get":
 
+    # Assertions for before_request.py authorization
+    if is_authorized and is_valid_id:
+        assert client_instance_before_request.token == is_authorized
+    client_class_before_request.load_by_attr.assert_called_once_with("token", is_authorized) if is_authorized else None
+    
+    # Method-specific assertions
+    if method == "get":
         assert response.status_code == 200 if is_valid_id else 404
         client_class_in_route.load_by_id.assert_called_once_with(client_id)
         client_instance_in_route.to_dict.assert_called_once() if is_valid_id else None
@@ -91,21 +98,6 @@ def test_client_method(
     else:
         assert response.status_code == 401
 
+    # Assertions for client.py - always called because authorization is checked in the route for this endpoint 
     client_class_in_route.load_by_id.assert_called_once_with(client_id)
 
-
-"""
-authorizing_client = get_mock_class("before_requests.Client")
-attrs = {
-    'token': authorization_token,
-}
-authenticated_client = get_mock_object(authorizing_client, **attrs)
-"""
-"""
-if authorized:
-    print("Checking authorizing_client.load_by_attr calls")
-    print(f"Authorizing client mock after request: {authorizing_client}")
-    print(f"Mock calls: {authorizing_client.load_by_attr.mock_calls}")
-    authorizing_client.load_by_attr.assert_called_once_with("token", authorization_token)
-    assert authenticated_client.token == authorization_token
-"""
