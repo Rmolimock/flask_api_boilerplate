@@ -4,9 +4,16 @@ from unittest.mock import patch
 
 
 def test_client_method(
-    mocker, is_valid_id, method_no_post, is_authorized, is_valid_data, mock_obj_if_valid_id, make_request, mock_obj_if_authorized
+    mocker, is_valid_id, method_no_post_put_data, is_authorized, mock_obj_if_valid_id, make_request, mock_obj_if_authorized
 ):
-    method = method_no_post
+    
+    method = method_no_post_put_data
+    if method == 'put-valid':
+        method = 'put'
+        is_valid_data = {"name": str(uuid4())}
+    elif method == 'put-invalid':
+        method = 'put'
+        is_valid_data = {}
 
     # MOCK VALUES AND SETUP ===================================================
 
@@ -34,7 +41,7 @@ def test_client_method(
     client_id = client_instance_in_route.id if is_valid_id else str(uuid4())
 
     # A.8
-    if is_valid_id and is_authorized and method_no_post == "put" and is_valid_data:
+    if is_valid_id and is_authorized and method == "put" and is_valid_data:
         client_class_in_route.load_by_attr.return_value = None
 
 

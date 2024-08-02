@@ -150,6 +150,14 @@ def method_no_post(request):
     """
     return request.param
 
+@pytest.fixture(params=["get", "put-valid", "put-invalid", "delete"])
+def method_no_post_put_data(request):
+    """
+    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
+    should be tested separately, not parameterized. Check both valid/invalid PUT data.
+    """
+    return request.param
+
 
 @pytest.fixture(params=[True, False])
 def is_valid_id(request):
