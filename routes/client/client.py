@@ -6,6 +6,7 @@ GET, DELETE, PUT client by id
 
 from models import Client
 from routes.client import clients_v1
+from authorization import get_request_form_attr, get_request_token
 
 # from temp_replace.authorization import authorized_client
 
@@ -42,17 +43,13 @@ def get_by_id(id):
     if request.method == "GET":
         return client.to_dict(), 200
 
-    # PUT SOME OF THIS LOGIC INTO A HELPER FUNCTION SO I CAN REUSE IT,
-    # AND MOCK IT RATHER THAN HAVING TO MOCK THE REQUEST OBJECT ITSELF
-    # AND HAVING TO WORK INSIDE THE REQUEST CONTEXT
-    # DELETE and PUT require authorization
+    # TODO some of this can become helper functions in authorization.py
     if not hasattr(request, "token"):
         return unauthorized_message
-    token = request.token
+    token = get_request_token(request)
     if not token:
         return unauthorized_message
     if token != client.token:
-        print(token, client.token)
         return unauthorized_message
 
     if request.method == "DELETE":
@@ -62,7 +59,7 @@ def get_by_id(id):
 
     elif request.method == "PUT":
 
-        name = request.form.get("name")
+        name = get_request_form_attr(request, "name")
 
         if not name:
             return "Client name is required\n", 400

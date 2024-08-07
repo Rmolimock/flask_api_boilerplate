@@ -62,6 +62,8 @@ def mock_obj_if_valid_id(is_valid_id):
         if is_valid_id:
             return load_mock_obj_by_id(mock_class, is_valid_id)
         else:
+            mock_class.load_by_id.return_value = None
+            mock_class.load_by_attr.return_value = None
             return None
 
     return func
@@ -158,7 +160,6 @@ def is_valid_id(request):
 def is_authorized(request):
     return str(uuid4()) if request.param else None
 
-
-@pytest.fixture(params=[True, False])
-def is_valid_data(request):
-    return {"name": str(uuid4())} if request.param else {}
+@pytest.fixture()
+def is_valid_data(request, method_no_post_put_data):
+    return {"name": str(uuid4())} if method_no_post_put_data == "put-valid" else {}
