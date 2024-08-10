@@ -4,6 +4,41 @@ from unittest.mock import patch
 from flask import request
 
 
+def mock_client_in_route(mocker, is_valid_id, is_authorized, mock_obj_if_valid_id, method, is_valid_data):
+    # A.1
+    client_class_in_route = mocker.patch("routes.client.client.Client")
+
+    # A.2, A.3, A.4, A.5
+    client_instance_in_route = mock_obj_if_valid_id(client_class_in_route)
+
+    # A.6
+    if is_valid_id and is_authorized:
+        client_instance_in_route.token = is_authorized
+
+    # A.9
+    if method == "put" and is_valid_id and is_authorized and is_valid_data:
+        client_class_in_route.load_by_attr.return_value = None
+
+    return client_class_in_route, client_instance_in_route
+
+
+def mock_route_helpers(mocker, is_valid_data, is_valid_id, is_authorized, method):
+    # A.7
+    mock_get_request_token = mocker.patch("routes.client.client.get_request_token")
+    mock_get_request_token.return_value = is_authorized
+
+    # A.8
+    mock_get_request_form_attr = mocker.patch(
+            "routes.client.client.get_request_form_attr"
+        )
+    if method == "put" and is_valid_id and is_authorized:
+        mock_get_request_form_attr.return_value = is_valid_data.get("name")
+    else:
+        mock_get_request_form_attr.return_value = None
+
+    return mock_get_request_token, mock_get_request_form_attr
+
+
 def test_client_method(
     mocker,
     is_valid_id,
@@ -22,13 +57,13 @@ def test_client_method(
     # MOCK VALUES AND SETUP ===================================================
     # =========================================================================
 
-    # A.  [ ] IN ROUTE - Mocking the search for client by id in GET /v1/clients/{id} ======
+    # A.  [X] IN ROUTE - Mocking the search for client by id in GET /v1/clients/{id} ======
 
     # The code always enters the route because it's shared between authorized and unauthorized requests.
     # GET does not require authorization, but PUT and DELETE do, which means they must check that the
     # client.token matches the request.token manually, rather than relying on a wrapper function to do so.
 
-    # [ ] [ ] Mocked | Asserted (if applicable)
+    # [X] [X] Mocked | Asserted (if applicable)
     # [X]     1. Client Class is mocked
     # [X]     2. client instance is mocked if is_valid_id
     # [X] [X] 3. client instance is returned by Client.load_by_id(id) if is_valid_id
@@ -40,39 +75,21 @@ def test_client_method(
     # [X] [X] 9. Client.load_by_attr(name) returns None if method == "put" and is_valid_name and is_authorized
     # [X] [X] 10. Use is_valid_id for request if present, else dummy id
 
-    # A.1
-    client_class_in_route = mocker.patch("routes.client.client.Client")
+    # A.1 - A.6, A.9
+    client_class_in_route, client_instance_in_route = mock_client_in_route(
+        mocker, is_valid_id, is_authorized, mock_obj_if_valid_id, method, is_valid_data
+    )
 
-    # A.2, A.3, A.4, A.5
-    client_instance_in_route = mock_obj_if_valid_id(client_class_in_route)
-
-    # A.6
-    if is_valid_id and is_authorized:
-        client_instance_in_route.token = is_authorized
-
-    # A.7
-    mock_get_request_token = mocker.patch("routes.client.client.get_request_token")
-    mock_get_request_token.return_value = is_authorized
-
-    # A.8
-    mock_get_request_form_attr = mocker.patch(
-            "routes.client.client.get_request_form_attr"
-        )
-    if method == "put" and is_valid_id and is_authorized:
-        mock_get_request_form_attr.return_value = is_valid_data.get("name")
-    else:
-        mock_get_request_form_attr.return_value = None
-
-    # A.9
-    if method == "put" and is_valid_id and is_authorized and is_valid_data:
-        client_class_in_route.load_by_attr.return_value = None
+    mock_get_request_token, mock_get_request_form_attr = mock_route_helpers(
+        mocker, is_valid_data, is_valid_id, is_authorized, method
+    )
 
     # A.10
     client_id = client_instance_in_route.id if is_valid_id else str(uuid4())
 
 
-    # B.  [ ] IN BEFORE_REQUESTS.py - Mocking the search for client by =========
-    # [ ] [ ] Mocked | Asserted (if applicable)
+    # B.  [X] IN BEFORE_REQUESTS.py - Mocking the search for client by =========
+    # [X] [X] Mocked | Asserted (if applicable)
     #        authorization token in before_requests.py
     # [X]     1. Client class is mocked
     # [X]     2. client instance is mocked if is_authorized

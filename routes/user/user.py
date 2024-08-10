@@ -1,6 +1,6 @@
 from routes.user import users_v1
 
-# from temp_replace.authorization import authorized_client
+# from authorization import authorized_client
 
 
 # add authorized_client back here once tests are rebuilt (all user routes)
