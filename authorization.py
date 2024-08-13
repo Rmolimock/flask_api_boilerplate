@@ -13,3 +13,28 @@ def get_request_form_attr(request, attr):
 
 
 unauthorized_message = "Unauthorized\n", 401
+
+
+# Authorization wrapper function:
+# import functools wrapper
+from functools import wraps
+
+# decorator function
+def authorized(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        from models.client_model import Client
+        from flask import request
+
+        token = get_request_token(request)
+
+        if not token:
+            return unauthorized_message
+
+        client = Client.load_by_attr("token", token)
+        if not client:
+            return unauthorized_message
+
+        return f(*args, **kwargs)
+
+    return decorated

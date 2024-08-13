@@ -1,7 +1,6 @@
 from routes.user import users_v1
 from models import User
-
-# from authorization import authorized_client
+from authorization import authorized
 
 
 # add authorized_client back here once tests are rebuilt (all user routes)
@@ -48,8 +47,9 @@ def all_users():
 
 
 @users_v1.route("/<id>", methods=["GET", "DELETE", "PUT"], strict_slashes=False)
+@authorized
 def get_by_id(id):
-    """
+    """"
     Get, update, or delete a user by id
     """
     from flask import request

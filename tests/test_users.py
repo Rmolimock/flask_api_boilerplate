@@ -2,7 +2,7 @@ import pytest
 from uuid import uuid4
 
 
-def test_user_by_id(is_valid_id, method, mock_obj_if_valid_id, make_request, mocker):
+def test_user_by_id(is_valid_id, method_no_post_put_data, mock_obj_if_valid_id, make_request, mocker):
     # =========================================================================
     # MOCK VALUES AND SETUP ===================================================
     # =========================================================================
@@ -16,6 +16,9 @@ def test_user_by_id(is_valid_id, method, mock_obj_if_valid_id, make_request, moc
     # [ ] [ ] 6. user.token matches is_authorized if is_valid_id -
     # [ ] [ ] 7. request.token matches is_authorized if is_valid_id - these two I can change to some authorized wrapper
     # [ ] [ ] 8. get_request_form_attr returns is_valid_data.get("name") if method
+    method = method_no_post_put_data
+    if 'put' in method:
+        method = 'put'
 
     # A.1
     user_class = mocker.patch("routes.user.user.User")
@@ -25,6 +28,7 @@ def test_user_by_id(is_valid_id, method, mock_obj_if_valid_id, make_request, moc
 
     user_id = is_valid_id if is_valid_id else str(uuid4())
 
-    response = make_request(method, f"v1/users/{user_id}")
+    response = make_request(method, f"/v1/users/{user_id}")
 
+    assert response.status_code == 401
     assert response.status_code != 200
