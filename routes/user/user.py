@@ -1,4 +1,5 @@
 from routes.user import users_v1
+from models import User
 
 # from authorization import authorized_client
 
@@ -10,7 +11,6 @@ def create_user():
     Create a user
     """
     from flask import request
-    from models import User
 
     name = request.form.get("name")
     handle = request.form.get("handle")

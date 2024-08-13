@@ -39,15 +39,15 @@ def mock_route_helpers(mocker, is_valid_data, is_valid_id, is_authorized, method
     return mock_get_request_token, mock_get_request_form_attr
 
 
-def test_client_method(
-    mocker,
+def test_clients_by_id(
     is_valid_id,
     method_no_post_put_data,
     is_authorized,
+    is_valid_data,
     mock_obj_if_valid_id,
     make_request,
     mock_obj_if_authorized,
-    is_valid_data,
+    mocker
 ):
     method = method_no_post_put_data
     if "put" in method:
