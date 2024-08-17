@@ -2,7 +2,7 @@ import pytest
 from uuid import uuid4
 
 
-def test_user_by_id(is_valid_id, method_no_post_put_data, mock_obj_if_valid_id, make_request, mocker):
+def test_user_by_id(is_valid_id, method_no_post_put_data, is_authorized, mock_obj_if_valid_id, make_request, mocker):
     # =========================================================================
     # MOCK VALUES AND SETUP ===================================================
     # =========================================================================
@@ -26,9 +26,14 @@ def test_user_by_id(is_valid_id, method_no_post_put_data, mock_obj_if_valid_id, 
     # A.2, A.3, A.4, A.5
     mock_user = mock_obj_if_valid_id(user_class)
 
+    # mock authorization wrapper here
+
     user_id = is_valid_id if is_valid_id else str(uuid4())
 
-    response = make_request(method, f"/v1/users/{user_id}")
+    response = make_request(method, f"/v1/users/{user_id}", is_authorized)
 
     assert response.status_code == 401
+    if is_valid_id and is_authorized:
+        # once authorization wrapper is mocked, assert 200 here
+        pass
     assert response.status_code != 200
