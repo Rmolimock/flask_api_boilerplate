@@ -1,6 +1,5 @@
 from main import app
 from models import Client
-from authorization import get_request_token
 
 
 def get_authorization_token(request):

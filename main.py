@@ -23,7 +23,7 @@ migrate = Migrate(app, db)
 register_blueprints(app)
 
 # Register the before and after request handlers
-from before_requests import before_request
+# from before_requests import before_request
 from after_requests import after_request
 
 

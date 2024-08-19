@@ -1,3 +1,6 @@
+from models import Client
+
+
 def get_request_token(request):
     """
     Get the token from the request, if it exists. For testing purposes.
@@ -23,9 +26,9 @@ from functools import wraps
 def authorized(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        from models.client_model import Client
         from flask import request
 
+        request = get_request_token(request)
         token = get_request_token(request)
 
         if not token:

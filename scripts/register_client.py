@@ -31,7 +31,7 @@ if __name__ == "__main__":
     from sys import argv
 
     # check for correct usage
-    if not len(argv) == 2:
+    if len(argv) != 2:
         print("\nError. Correct usage:\n\tpython register_client.py <client_name>\n")
         exit()
 
