@@ -2,7 +2,7 @@ from uuid import uuid4
 import pytest
 from unittest.mock import patch
 from flask import request
-from conftest import mock_obj_if_valid_id
+from conftest import mock_obj_if_valid_id, mock_obj_if_authorized
 
 
 def mock_client_in_route(mocker, is_valid_id, is_authorized, method, is_valid_data):
@@ -46,7 +46,6 @@ def test_clients_by_id(
     is_authorized,
     is_valid_data,
     make_request,
-    mock_obj_if_authorized,
     mocker
 ):
     method = method_no_post_put_data
@@ -100,7 +99,7 @@ def test_clients_by_id(
     client_class_before_request = mocker.patch("before_requests.Client")
 
     # B.2, B.3, B.4
-    client_instance_before_request = mock_obj_if_authorized(client_class_before_request)
+    client_instance_before_request = mock_obj_if_authorized(is_authorized, client_class_before_request)
 
 
     # =========================================================================

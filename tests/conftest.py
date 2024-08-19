@@ -63,19 +63,14 @@ def mock_obj_if_valid_id(is_valid_id, mock_class):
         return None
 
 
-@pytest.fixture()
-def mock_obj_if_authorized(mocker, is_authorized):
-    # TODO clean up this function
-    def func(mock_class):
-        if is_authorized:
-            mock_obj = load_mock_obj_by_attr(mock_class, "token", is_authorized)
-            return mock_obj
-        else:
-            mock_class.load_by_id.return_value = None
-            mock_class.load_by_attr.return_value = None
-            return None
-
-    return func
+def mock_obj_if_authorized(is_authorized, mock_class):
+    if is_authorized:
+        mock_obj = load_mock_obj_by_attr(mock_class, "token", is_authorized)
+        return mock_obj
+    else:
+        mock_class.load_by_id.return_value = None
+        mock_class.load_by_attr.return_value = None
+        return None
 
 @pytest.fixture()
 def make_request(api):
