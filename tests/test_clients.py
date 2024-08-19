@@ -1,14 +1,11 @@
 from uuid import uuid4
-import pytest
 from unittest.mock import patch
-from flask import request
-from conftest import mock_obj_if_valid_id, mock_obj_if_authorized
+from conftest import mock_obj_if_valid_id, mock_obj_if_authorized, mock_with_patch
 
 
 def mock_client_in_route(is_valid_id, is_authorized, method, is_valid_data):
-    # A.1
-    patcher = patch("routes.client.client.Client")
-    client_class_in_route = patcher.start()
+
+    client_class_in_route = mock_with_patch("routes.client.client.Client")
 
     # A.2, A.3, A.4, A.5
     client_instance_in_route = mock_obj_if_valid_id(is_valid_id, client_class_in_route)
@@ -18,6 +15,9 @@ def mock_client_in_route(is_valid_id, is_authorized, method, is_valid_data):
         client_instance_in_route.token = is_authorized
 
     # A.9
+    # ex: client name already taken
+    client_class_in_route.load_by_attr.return_value = client_instance_in_route
+    # valid PUT data, meaning client name is unique
     if method == "put" and is_valid_id and is_authorized and is_valid_data:
         client_class_in_route.load_by_attr.return_value = None
 
@@ -26,17 +26,16 @@ def mock_client_in_route(is_valid_id, is_authorized, method, is_valid_data):
 
 def mock_route_helpers(is_valid_data, is_valid_id, is_authorized, method):
     # A.7
-    patcher = patch("routes.client.client.get_request_token")
-    mock_get_request_token = patcher.start()
+    mock_get_request_token = mock_with_patch("routes.client.client.get_request_token")
     mock_get_request_token.return_value = is_authorized
 
     # A.8
-    patcher = patch("routes.client.client.get_request_form_attr")
-    mock_get_request_form_attr = patcher.start()
+    mock_get_request_form_attr = mock_with_patch("routes.client.client.get_request_form_attr")
+
+    mock_get_request_form_attr.return_value = None
+
     if method == "put" and is_valid_id and is_authorized:
         mock_get_request_form_attr.return_value = is_valid_data.get("name")
-    else:
-        mock_get_request_form_attr.return_value = None
 
     return mock_get_request_token, mock_get_request_form_attr
 
@@ -164,7 +163,15 @@ def test_clients_by_id(
             # A.5
             client_instance_in_route.to_dict.assert_called_once() if is_valid_id and is_authorized else None
         else:
-            assert response.status_code == 400 if is_valid_id and is_authorized else 401
+            assert client_class_in_route.load_by_attr.return_value == client_instance_in_route
+            if is_valid_id and not is_authorized:
+                assert response.status_code == 401
+            elif is_valid_id and is_authorized:
+                assert response.status_code == 400
+            elif not is_valid_id and not is_authorized:
+                assert response.status_code == 404
+            elif not is_valid_id and is_authorized:
+                assert response.status_code == 404
 
     elif method == "delete":
         if is_valid_id and is_authorized:

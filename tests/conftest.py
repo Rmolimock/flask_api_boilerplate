@@ -72,6 +72,13 @@ def mock_obj_if_authorized(is_authorized, mock_class):
         mock_class.load_by_attr.return_value = None
         return None
 
+def mock_with_patch(path):
+    from unittest.mock import patch
+    # A.1
+    patcher = patch(path)
+    mock = patcher.start()
+    return mock
+
 @pytest.fixture()
 def make_request(api):
     """
