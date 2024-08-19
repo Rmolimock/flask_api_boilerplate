@@ -18,24 +18,11 @@ def test_app():
     # CLEAN UP
     yield app
 
-
 @pytest.fixture()
 def api(test_app):
     # initiate the test client, which I'll refer to as api
     # to avoid confusion with client objects
     return test_app.test_client()
-
-
-# =============================================================================
-# Simple mock values for fixtures =============================================
-# =============================================================================
-
-
-pytest.fixture()
-
-
-def mock_id():
-    return str(uuid4())
 
 
 # =============================================================================
@@ -55,6 +42,17 @@ def load_mock_obj_by_id(mock_class, id):
     mock_class.load_by_id.return_value = mock_obj
     return mock_obj
 
+def load_mock_obj_by_attr(mock_class, attr_name, value):
+    from unittest.mock import MagicMock
+
+    # 1. create and set up the mock instance
+    mock_obj = MagicMock()
+    # set mock object attribute of name attr_name with value
+    setattr(mock_obj, attr_name, value)
+    mock_obj.to_dict = MagicMock(return_value={attr_name: value})
+    # 2. the mock class to returns the mock instance with load_by_attr
+    mock_class.load_by_attr.return_value = mock_obj
+    return mock_obj
 
 @pytest.fixture()
 def mock_obj_if_valid_id(is_valid_id):
@@ -68,23 +66,19 @@ def mock_obj_if_valid_id(is_valid_id):
 
     return func
 
-
 @pytest.fixture()
 def mock_obj_if_authorized(mocker, is_authorized):
     # TODO clean up this function
     def func(mock_class):
         if is_authorized:
-            # mock object instance, make class return it by .token, make instance.to_dict return dict of attrs
-            mock_obj = mocker.MagicMock()
-            mock_obj.token = is_authorized
-            mock_class.load_by_attr.return_value = mock_obj
-            mock_obj.to_dict = mocker.MagicMock(return_value={"token": is_authorized})
+            mock_obj = load_mock_obj_by_attr(mock_class, "token", is_authorized)
             return mock_obj
         else:
+            mock_class.load_by_id.return_value = None
+            mock_class.load_by_attr.return_value = None
             return None
 
     return func
-
 
 @pytest.fixture()
 def make_request(api):
