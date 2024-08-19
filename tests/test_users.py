@@ -1,8 +1,9 @@
 import pytest
 from uuid import uuid4
+from conftest import mock_obj_if_valid_id
 
 
-def test_user_by_id(is_valid_id, method_no_post_put_data, is_authorized, mock_obj_if_valid_id, make_request, mocker):
+def test_user_by_id(is_valid_id, method_no_post_put_data, is_authorized, make_request, mocker):
     # =========================================================================
     # MOCK VALUES AND SETUP ===================================================
     # =========================================================================
@@ -24,7 +25,7 @@ def test_user_by_id(is_valid_id, method_no_post_put_data, is_authorized, mock_ob
     user_class = mocker.patch("routes.user.user.User")
 
     # A.2, A.3, A.4, A.5
-    mock_user = mock_obj_if_valid_id(user_class)
+    mock_user = mock_obj_if_valid_id(is_valid_id, user_class)
 
     # mock authorization wrapper here
 

@@ -54,17 +54,14 @@ def load_mock_obj_by_attr(mock_class, attr_name, value):
     mock_class.load_by_attr.return_value = mock_obj
     return mock_obj
 
-@pytest.fixture()
-def mock_obj_if_valid_id(is_valid_id):
-    def func(mock_class):
-        if is_valid_id:
-            return load_mock_obj_by_id(mock_class, is_valid_id)
-        else:
-            mock_class.load_by_id.return_value = None
-            mock_class.load_by_attr.return_value = None
-            return None
+def mock_obj_if_valid_id(is_valid_id, mock_class):
+    if is_valid_id:
+        return load_mock_obj_by_id(mock_class, is_valid_id)
+    else:
+        mock_class.load_by_id.return_value = None
+        mock_class.load_by_attr.return_value = None
+        return None
 
-    return func
 
 @pytest.fixture()
 def mock_obj_if_authorized(mocker, is_authorized):
