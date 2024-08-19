@@ -5,9 +5,10 @@ from flask import request
 from conftest import mock_obj_if_valid_id, mock_obj_if_authorized
 
 
-def mock_client_in_route(mocker, is_valid_id, is_authorized, method, is_valid_data):
+def mock_client_in_route(is_valid_id, is_authorized, method, is_valid_data):
     # A.1
-    client_class_in_route = mocker.patch("routes.client.client.Client")
+    patcher = patch("routes.client.client.Client")
+    client_class_in_route = patcher.start()
 
     # A.2, A.3, A.4, A.5
     client_instance_in_route = mock_obj_if_valid_id(is_valid_id, client_class_in_route)
@@ -23,15 +24,15 @@ def mock_client_in_route(mocker, is_valid_id, is_authorized, method, is_valid_da
     return client_class_in_route, client_instance_in_route
 
 
-def mock_route_helpers(mocker, is_valid_data, is_valid_id, is_authorized, method):
+def mock_route_helpers(is_valid_data, is_valid_id, is_authorized, method):
     # A.7
-    mock_get_request_token = mocker.patch("routes.client.client.get_request_token")
+    patcher = patch("routes.client.client.get_request_token")
+    mock_get_request_token = patcher.start()
     mock_get_request_token.return_value = is_authorized
 
     # A.8
-    mock_get_request_form_attr = mocker.patch(
-            "routes.client.client.get_request_form_attr"
-        )
+    patcher = patch("routes.client.client.get_request_form_attr")
+    mock_get_request_form_attr = patcher.start()
     if method == "put" and is_valid_id and is_authorized:
         mock_get_request_form_attr.return_value = is_valid_data.get("name")
     else:
@@ -46,7 +47,6 @@ def test_clients_by_id(
     is_authorized,
     is_valid_data,
     make_request,
-    mocker
 ):
     method = method_no_post_put_data
     if "put" in method:
@@ -76,11 +76,11 @@ def test_clients_by_id(
 
     # A.1 - A.6, A.9
     client_class_in_route, client_instance_in_route = mock_client_in_route(
-        mocker, is_valid_id, is_authorized, method, is_valid_data
+        is_valid_id, is_authorized, method, is_valid_data
     )
 
     mock_get_request_token, mock_get_request_form_attr = mock_route_helpers(
-        mocker, is_valid_data, is_valid_id, is_authorized, method
+        is_valid_data, is_valid_id, is_authorized, method
     )
 
     # A.10
@@ -96,7 +96,8 @@ def test_clients_by_id(
     # [X] [X] 4. client.token matches is_authorized
 
     # B.1
-    client_class_before_request = mocker.patch("before_requests.Client")
+    patcher = patch("before_requests.Client")
+    client_class_before_request = patcher.start()
 
     # B.2, B.3, B.4
     client_instance_before_request = mock_obj_if_authorized(is_authorized, client_class_before_request)
