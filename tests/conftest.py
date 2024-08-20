@@ -72,6 +72,14 @@ def mock_obj_if_authorized(is_authorized, mock_class):
         mock_class.load_by_attr.return_value = None
         return None
 
+def mock_class_load_if_valid_put_data(method, mock_class, mock_instance, is_valid_data):
+    if mock_instance:
+        mock_class.load_by_attr.return_value = mock_instance
+    if method == "put" and is_authorized and is_valid_data:
+        mock_class.load_by_attr.return_value = None
+    return
+
+
 def mock_with_patch(path):
     from unittest.mock import patch
     # A.1
@@ -137,6 +145,14 @@ def method_no_post(request):
 
 @pytest.fixture(params=["get", "put-valid", "put-invalid", "delete"])
 def method_no_post_put_data(request):
+    """
+    Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
+    should be tested separately, not parameterized. Check both valid/invalid PUT data.
+    """
+    return request.param
+
+@pytest.fixture(params=["get", "post", "put-valid", "put-invalid", "delete"])
+def method_put_data(request):
     """
     Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
     should be tested separately, not parameterized. Check both valid/invalid PUT data.

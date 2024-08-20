@@ -1,6 +1,6 @@
 from uuid import uuid4
 from unittest.mock import patch
-from conftest import mock_obj_if_valid_id, mock_obj_if_authorized, mock_with_patch
+from conftest import mock_obj_if_valid_id, mock_obj_if_authorized, mock_with_patch, mock_class_load_if_valid_put_data
 
 
 def mock_client_in_route(is_valid_id, is_authorized, method, is_valid_data):
@@ -15,11 +15,8 @@ def mock_client_in_route(is_valid_id, is_authorized, method, is_valid_data):
         client_instance_in_route.token = is_authorized
 
     # A.9
-    # ex: client name already taken
-    client_class_in_route.load_by_attr.return_value = client_instance_in_route
     # valid PUT data, meaning client name is unique
-    if method == "put" and is_valid_id and is_authorized and is_valid_data:
-        client_class_in_route.load_by_attr.return_value = None
+    mock_class_load_if_valid_put_data(method, client_class_in_route, client_instance_in_route, is_valid_data)
 
     return client_class_in_route, client_instance_in_route
 
