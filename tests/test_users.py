@@ -34,7 +34,7 @@ def test_user_by_id(is_valid_id, method_no_post_put_data, is_authorized, make_re
     user_id = is_valid_id if is_valid_id else str(uuid4())
 
     response = make_request(method, f"/v1/users/{user_id}", is_authorized)
-
+    # TODO: reorganize this ordered by method
     assert mock_user_class.load_by_id.called_once_with(user_id)
     if is_valid_id:
         assert mock_user_class.load_by_id.return_value != None
