@@ -32,6 +32,7 @@ def authorized(f):
         token = get_request_token(request)
 
         if not token:
+            print(1)
             return unauthorized_message
 
         client = Client.load_by_attr("token", token)

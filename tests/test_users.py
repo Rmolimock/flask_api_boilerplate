@@ -30,6 +30,13 @@ def test_user_by_id(is_valid_id, method_no_post_put_data, is_authorized, make_re
         mock_user.token = is_authorized
     # ---
     # mock authorization wrapper here
+    mock_client_in_before = mock_with_patch("authorization.Client")
+    mock_client_instance = mock_obj_if_authorized(is_authorized, mock_client_in_before)
+    mock_client_in_before.load_by_attr.return_value = mock_client_instance
+    if is_authorized:
+        mock_get_request_token = mock_with_patch("authorization.get_request_token")
+        mock_get_request_token.return_value = is_authorized
+        # sort this out. get_request_token and get_authorization_token are redundant
 
     user_id = is_valid_id if is_valid_id else str(uuid4())
 
@@ -41,6 +48,9 @@ def test_user_by_id(is_valid_id, method_no_post_put_data, is_authorized, make_re
         assert mock_user.id == is_valid_id
         assert is_valid_id == user_id
         assert mock_user.to_dict.called_once()
+        if is_authorized:
+            print(is_authorized)
+            mock_client_in_before.assert_called_once_with("token", is_authorized)
     else:
         assert mock_user_class.load_by_id.return_value == None
     assert response.status_code == 401
