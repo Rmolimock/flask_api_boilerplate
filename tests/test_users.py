@@ -36,7 +36,7 @@ def test_user_by_id(is_valid_id, method_no_post_put_data, is_authorized, make_re
     if is_authorized:
         mock_get_request_token = mock_with_patch("authorization.get_request_token")
         mock_get_request_token.return_value = is_authorized
-        # sort this out. get_request_token and get_authorization_token are redundant
+        # TODO sort this out. get_request_token and get_authorization_token are redundant
 
     user_id = is_valid_id if is_valid_id else str(uuid4())
 
