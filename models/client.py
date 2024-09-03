@@ -1,4 +1,4 @@
-from models.base_model import BaseModel, db
+from models.base import BaseModel, db
 
 
 class Client(BaseModel):

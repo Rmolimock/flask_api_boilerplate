@@ -1,3 +1,2 @@
-from models.base_model import BaseModel
-from models.client_model import Client
-from models.user_model import User
+from models.base import BaseModel
+from models.client import Client
