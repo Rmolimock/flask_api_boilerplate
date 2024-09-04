@@ -93,6 +93,11 @@ def method(request):
 def is_valid_data(request, method):
     return {"data": str(uuid4())} if method == "put-valid" else {}
 
+def normalized_put_method_name(method):
+    if 'PUT' in method or 'put' in method:
+        method = 'PUT'
+    return method
+
 @pytest.fixture(params=[True, False])
 def is_authorized(request):
     mock_get_auth_client = mock_with_patch("authorization.get_client_from_token")

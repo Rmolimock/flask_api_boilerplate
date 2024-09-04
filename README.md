@@ -47,9 +47,9 @@ This is a boilerplate repo for a Flask API. I'm creating it to help me get start
 9. sudo apt-get install mysql-server # if you don't have MySQL installed
 10. mysql -u root -p 
 11. sudo mysql # to enter into the mysql shell, then within the shell:
-12. ALTER USER 'user_from_.env_file-probably_root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password_from_.env_file';
+12. ALTER USER '[user from .env file - probably root]'@'localhost' IDENTIFIED by '[password from .env_file]';
 FLUSH PRIVILEGES;
-CREATE DATABASE 'database_name_from_.env_file';
+CREATE DATABASE 'database name from .env file';
 EXIT;
 ### Setup database version control
 13. flask db init # if you don't have migrations folder, alembic.ini, or env.py yet
