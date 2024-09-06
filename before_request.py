@@ -12,7 +12,6 @@ def set_request_token(token):
 
     return
 
-
 def set_request_client(client):
     from flask import request
 
@@ -22,6 +21,11 @@ def set_request_client(client):
 
     return
 
+def get_request_form_attr(request, attr):
+    """
+    Get the attribute from the request. For testing purposes.
+    """
+    return request.form.get(attr)
 
 @app.before_request
 def before_request():

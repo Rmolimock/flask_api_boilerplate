@@ -5,6 +5,7 @@ from functools import wraps
 
 unauthorized_message = {"message": "Unauthorized\n"}, 401
 
+
 def get_authorization_token(request):
     """
     Extracts the authorization token from the request headers, if present.
@@ -15,12 +16,14 @@ def get_authorization_token(request):
 
     return token[7:]
 
+
 def get_client_from_token(token):
     """
     Returns client based on given token if valid, else None.
     This extra function wrapping around load_by_attr is needed for mocking in tests."""
     client = Client.load_by_attr("token", token)
     return client
+
 
 # wrapper to check for authorization token in request
 def authorize(func):

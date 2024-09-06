@@ -24,13 +24,14 @@ register_blueprints(app)
 
 # Register the before and after request handlers
 from before_request import before_request
+
 # from after_requests import after_request
 
 
 from authorization import authorize
 
 
-@app.route('/status')
+@app.route("/status")
 @authorize
 def status():
-    return {'message': 'OK'}, 200
+    return {"message": "OK"}, 200

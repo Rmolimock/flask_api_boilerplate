@@ -5,17 +5,22 @@ from conftest import normalized_put_method_name
 
 def test_status(method, is_authorized, is_valid_data, make_request):
     """
-    Test the status endpoint with the following parameters:
+    Test the /status endpoint with the following parameters:
     - HTTP methods
     - Authorization header
     - Valid and invalid put data
     """
 
+    # SETUP & MOCK ============================================================
     method = normalized_put_method_name(method)
 
-    response = make_request(method, '/status', data=is_valid_data, authorization_header=is_authorized)
+    # ACTION ==================================================================
+    response = make_request(
+        method, "/status", data=is_valid_data, authorization_header=is_authorized
+    )
 
-    if method != 'GET':
+    # ASSERTIONS ==============================================================
+    if method != "GET":
         assert response.status_code == 405
         return
 
@@ -25,4 +30,4 @@ def test_status(method, is_authorized, is_valid_data, make_request):
         return
 
     assert response.status_code == 200
-    assert response.get_json() == {'message': 'OK'}
+    assert response.get_json() == {"message": "OK"}
