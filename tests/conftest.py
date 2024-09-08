@@ -31,11 +31,9 @@ def api(test_app):
     return test_app.test_client()
 
 
-
 # =============================================================================
 # Helper functions for fixtures ===============================================
 # =============================================================================
-
 
 
 def mock_with_patch(path):
@@ -48,6 +46,7 @@ def mock_with_patch(path):
     patcher = patch(path)
     mock = patcher.start()
     return mock
+
 
 def load_mock_obj_by_id(mock_class, id):
     """
@@ -65,17 +64,26 @@ def load_mock_obj_by_id(mock_class, id):
     mock_class.load_by_id.return_value = mock_obj
     return mock_obj
 
-def mock_obj_if_valid_id(is_valid_id, mock_class):
+
+# This function is too prescriptive. Rethink the ways its used and decouple them if necessary.
+def mock_obj_if_valid_id(is_valid_id, path=None, mock_class=None):
     """
     If valid id, return load_mock_obj_by_id, else mock the class' methods
     load_by_id and load_by_attr to return None, and return None.
     """
+    if not path and not mock_class:
+        raise ValueError("Either path or mock_class must be provided")
+
+    if path and not mock_class:
+        mock_class = mock_with_patch(path)
+
     if is_valid_id:
         return load_mock_obj_by_id(mock_class, is_valid_id)
     else:
         mock_class.load_by_id.return_value = None
         mock_class.load_by_attr.return_value = None
         return None
+
 
 def normalized_put_method_name(method):
     """
@@ -89,6 +97,7 @@ def normalized_put_method_name(method):
     if "PUT" in method or "put" in method:
         method = "PUT"
     return method
+
 
 @pytest.fixture()
 def make_request(api):
@@ -146,6 +155,7 @@ def method(request):
     should be tested separately, not parameterized.
     """
     return request.param
+
 
 @pytest.fixture(params=[True, False])
 def is_authorized(request):

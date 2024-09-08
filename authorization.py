@@ -5,6 +5,7 @@ from functools import wraps
 
 unauthorized_message = {"message": "Unauthorized\n"}, 401
 
+
 def get_authorization_token(request):
     """
     Extracts the authorization token from the request headers, if present.
