@@ -1,19 +1,11 @@
 from authorization import unauthorized_message
-from conftest import normalized_put_method_name, mock_with_patch, mock_obj_if_valid_id
+from conftest import normalized_put_method_name, mock_with_patch
 import pytest
 from uuid import uuid4
 from unittest.mock import MagicMock
 
 
-def mock_put_requests(is_valid_data):
-    mock_get_name = mock_with_patch("routes.client.client.get_request_form_attr")
-    mock_get_name.return_value = True
-    mock_client_class = mock_with_patch("routes.client.client.Client")
-    mock_client_class.load_by_attr.return_value = False if is_valid_data else True
-    mock_client = mock_obj_if_valid_id(True, mock_class=mock_client_class)
-
-
-def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_request):
+def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_request, mock_resource):
     """
     Test the /clients/id endpoint with the following parameters:
     - HTTP methods
@@ -23,24 +15,23 @@ def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_re
 
     # SETUP & MOCK ============================================================
     method = normalized_put_method_name(method)
-
-    # only mock finding client by id if is_valid_id
-    mock_client = mock_obj_if_valid_id(is_valid_id, path="routes.client.client.Client")
+    
+    mock_class, mock_obj = mock_resource("routes.client.client.Client")
 
     client_id = is_valid_id if is_valid_id else str(uuid4())
 
-    # mock updating data in PUT requests
+    # mock updating data during PUT requests
+    get_attr_from_request_form = mock_with_patch("routes.client.client.get_attr_from_request_form")
+    get_attr_from_request_form.return_value = False
     if method == "PUT" and is_valid_id and is_authorized and is_valid_data:
-        mock_put_requests(is_valid_data)
-
-    data = {"name": str(uuid4())} if is_valid_data else {}
+        get_attr_from_request_form.return_value = True 
 
     # ACTION ==================================================================
     response = make_request(
         method,
         f"/v1/clients/{client_id}/",
-        authorization_header=is_authorized,
-        data=data,
+        authorization=is_authorized,
+        data=is_valid_data,
     )
 
     # ASSERTIONS ==============================================================
@@ -56,7 +47,7 @@ def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_re
         assert response.status_code == 401
         # assert response.get_json() == unauthorized_message[0]
         return
-
+    
     if not is_valid_id:
         # method allowed and request authorized but nothing found due to bad id
         assert response.status_code == 404
@@ -78,3 +69,5 @@ def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_re
 
     # method allowed, request authorized, valid id, GET request
     assert response.status_code == 200
+    assert mock_obj.id == is_valid_id
+    assert response.get_json().get("client") == mock_obj.to_dict()

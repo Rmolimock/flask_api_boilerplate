@@ -47,52 +47,13 @@ def mock_with_patch(path):
     mock = patcher.start()
     return mock
 
-
-def load_mock_obj_by_id(mock_class, id):
-    """
-    Create a mock object, mock its id and to_dict() approopriately, and mock
-    the given class to return said object upon [Class].load_by_id.
-    """
-    from unittest.mock import MagicMock
-
-    # 1. create and set up the mock instance
-    mock_obj = MagicMock()
-    mock_obj.id = id
-    mock_obj.to_dict = MagicMock(return_value={"id": id})
-
-    # 2. the mock class to returns the mock instance with load_by_id
-    mock_class.load_by_id.return_value = mock_obj
-    return mock_obj
-
-
-# This function is too prescriptive. Rethink the ways its used and decouple them if necessary.
-def mock_obj_if_valid_id(is_valid_id, path=None, mock_class=None):
-    """
-    If valid id, return load_mock_obj_by_id, else mock the class' methods
-    load_by_id and load_by_attr to return None, and return None.
-    """
-    if not path and not mock_class:
-        raise ValueError("Either path or mock_class must be provided")
-
-    if path and not mock_class:
-        mock_class = mock_with_patch(path)
-
-    if is_valid_id:
-        return load_mock_obj_by_id(mock_class, is_valid_id)
-    else:
-        mock_class.load_by_id.return_value = None
-        mock_class.load_by_attr.return_value = None
-        return None
-
-
 def normalized_put_method_name(method):
     """
     Normalize PUT method names into 'PUT'. This is required because PUT-VALID
     and PUT-INVALID are used in the method parameter to inform the
-    is_valid_data fixture, allowing the parameterization of both types. Then
+    is_valid_data fixture, allowing the parameterization of both types of requests. Then
     the actual method name must be normalized into a valid http method
-    afterwards because it's used by make_request to inform which request to
-    make.
+    afterwards because it determines which request make_request will send.
     """
     if "PUT" in method or "put" in method:
         method = "PUT"
@@ -105,7 +66,7 @@ def make_request(api):
     Return a function that makes requests of a given type to the test API. Optional authorization header.
     """
 
-    def request_func(method, route, authorization_header=None, data={}):
+    def request_func(method, route, authorization=None, data={}):
         """
         Makes requests of a given type to the test API. Optional authorization header and PUT data.
         """
@@ -134,8 +95,8 @@ def make_request(api):
 
         headers = {}
 
-        if authorization_header:
-            headers["Authorization"] = f"Bearer {authorization_header}"
+        if authorization:
+            headers["Authorization"] = f"Bearer {authorization}"
 
         method_func = getattr(api, method)
         return method_func(route, headers=headers, json=data)
@@ -190,3 +151,45 @@ def is_valid_id(request):
     can not receive an argument for which object is to be mocked from the test.
     """
     return str(uuid4()) if request.param else None
+
+@pytest.fixture
+def mock_resource(method, is_valid_id, is_valid_data):
+    from unittest.mock import MagicMock
+    # if is_valid_id, return function for mocking a given class & object (values can be overridden)
+    # else, return function that mocks class but has it's load methods return None (values can be overridden)
+    # this way, no matter if is_valid_id or not, I can call this function with resource being requested and
+    # it will mock it correctly based on it's own knowledge of is_valid_id.
+    def get_mock_resource(class_path, valid_id_return=False, valid_attr_return=False, invalid_id_return=False, invalid_attr_return=False, **to_dict_ret):
+        '''
+        class_path is used to patch in a class.
+        An instance of that class will be mocked, given an id = is_valid_id, and a .to_dict() method.
+        The class will have mock .load_by_id and .load_by_attr methods.
+        -----------------------------------------------------------------------
+        '''
+        # patch the class
+        mock_class = mock_with_patch(class_path)
+
+        # mock the object instance of that class
+        mock_obj = MagicMock()
+        mock_obj.id = is_valid_id
+
+        # mock the .to_dict() method so it can be serialized
+        to_dict = to_dict_ret if to_dict_ret else {"id": is_valid_id}
+        mock_obj.to_dict = MagicMock(return_value=to_dict)
+
+        # if is_valid_id load methods return the instance/object, else None.
+        if is_valid_id:
+            mock_class.load_by_id.return_value = valid_id_return if valid_id_return is not False else mock_obj
+        else:
+            mock_class.load_by_id.return_value = invalid_id_return if invalid_id_return is not False else None
+
+        if is_valid_data and "PUT" in method:
+            mock_class.load_by_attr.return_value = valid_attr_return if valid_attr_return is not False else None
+        elif not is_valid_data and "PUT" in method:
+            # put data is invalid if it's taken by another instance of that resource, which would
+            # return an instance with a different id
+            mock_obj.id = str(uuid4())
+            mock_class.load_by_attr.return_value = invalid_attr_return if invalid_attr_return is not False else mock_obj
+        return mock_class, mock_obj
+    
+    return get_mock_resource

@@ -16,7 +16,7 @@ def test_status(method, is_authorized, is_valid_data, make_request):
 
     # ACTION ==================================================================
     response = make_request(
-        method, "/status", data=is_valid_data, authorization_header=is_authorized
+        method, "/status", data=is_valid_data, authorization=is_authorized
     )
 
     # ASSERTIONS ==============================================================

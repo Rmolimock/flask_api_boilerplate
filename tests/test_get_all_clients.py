@@ -15,7 +15,7 @@ def test_all_clients(method, is_authorized, is_valid_data, make_request):
     method = normalized_put_method_name(method)
 
     response = make_request(
-        method, "/v1/clients/", data=is_valid_data, authorization_header=is_authorized
+        method, "/v1/clients/", data=is_valid_data, authorization=is_authorized
     )
 
     if method != "GET":
