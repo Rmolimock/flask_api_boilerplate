@@ -23,7 +23,7 @@ def set_request_client(client):
     return
 
 
-def get_request_form_attr(request, attr):
+def get_attr_from_request_form(request, attr):
     """
     Get the attribute from the request. For testing purposes.
     """

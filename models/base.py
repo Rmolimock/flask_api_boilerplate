@@ -51,11 +51,10 @@ class BaseModel(db.Model):
         """
         Load all the objects from the database. Optionally remove an attribute from the response.
         """
-        res = [obj.to_dict() for obj in cls.load_all()]
-        if remove_attr:
-            for item in res:
-                del item[remove_attr]
-        return res
+        return [
+        {k: v for k, v in obj.to_dict().items() if k != remove_attr} 
+        for obj in cls.load_all()
+        ]
 
     @classmethod
     def load_by_id(cls, id):
