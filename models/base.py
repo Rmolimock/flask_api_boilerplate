@@ -47,11 +47,15 @@ class BaseModel(db.Model):
         return db.session.query(cls).all()
 
     @classmethod
-    def load_all_dict(cls):
+    def load_all_dict(cls, remove_attr=None):
         """
-        Load all the objects from the database
+        Load all the objects from the database. Optionally remove an attribute from the response.
         """
-        return [obj.to_dict() for obj in cls.load_all()]
+        res = [obj.to_dict() for obj in cls.load_all()]
+        if remove_attr:
+            for item in res:
+                del item[remove_attr]
+        return res
 
     @classmethod
     def load_by_id(cls, id):

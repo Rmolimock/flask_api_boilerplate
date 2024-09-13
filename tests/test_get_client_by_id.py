@@ -52,6 +52,10 @@ def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_re
         # method allowed and request authorized but nothing found due to bad id
         assert response.status_code == 404
         return
+    
+    # TODO: In the future, ensure only the client being requested can perform the request.
+    # is_valid_id == client.id found via authorization token. This may involve adding another
+    # parameter to mock_resource. If token-found client.id is/isn't = is_valid_id.
 
     if method == "PUT":
         if not is_valid_data:

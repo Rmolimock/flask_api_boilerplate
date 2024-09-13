@@ -30,3 +30,6 @@ def test_all_clients(method, is_authorized, is_valid_data, make_request):
     assert response.status_code == 200
     assert "clients" in response.get_json()
     assert isinstance(response.get_json().get("clients"), list)
+    assert "token" not in response.get_json()
+    # TODO: this token not in response assert was giving a false positive.
+    # Must mock/parameterize the response to include token and not.

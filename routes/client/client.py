@@ -1,5 +1,5 @@
 from models import Client
-from before_request import get_request_form_attr
+from before_request import get_attr_from_request_form
 from routes.client import clients_v1
 from authorization import authorize
 
@@ -7,7 +7,7 @@ from authorization import authorize
 @clients_v1.route("/", methods=["GET"], strict_slashes=False)
 @authorize
 def all_clients():
-    clients = Client.load_all()
+    clients = Client.load_all_dict(remove_attr="token")
     return {"clients": clients}, 200
 
 
@@ -30,7 +30,7 @@ def client_by_id(id):
 
     # method == PUT
 
-    name = get_request_form_attr(request, "name")
+    name = get_attr_from_request_form(request, "name")
 
     if not name:
         return {"message": "Name is required"}, 400
