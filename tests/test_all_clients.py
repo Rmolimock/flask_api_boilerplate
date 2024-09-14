@@ -18,7 +18,7 @@ def test_all_clients(method, is_authorized, is_valid_data, make_request):
         method, "/v1/clients/", data=is_valid_data, authorization=is_authorized
     )
 
-    if method != "GET":
+    if method not in ["GET"]:
         assert response.status_code == 405
         return
 

@@ -24,14 +24,16 @@ def get_client_from_token(token):
     client = Client.load_by_attr("token", token)
     return client
 
+def authorize(request):
+    token = get_authorization_token(request)
+    return get_client_from_token(token)
+    
 
 # wrapper to check for authorization token in request
-def authorize(func):
+def authorize_route(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        token = get_authorization_token(request)
-        client = get_client_from_token(token)
-        if not client:
+        if not authorize(request):
             return unauthorized_message
 
         return func(*args, **kwargs)

@@ -140,6 +140,7 @@ def is_valid_data(request, method):
     Parameterizes whether or not the data for PUT requests is valid. Informed
     by teh method parameter.
     """
+    print(f"is_valid_data is {method == 'PUT-VALID'}")
     return {"data": "valid data"} if method == "PUT-VALID" else {}
 
 
@@ -151,6 +152,22 @@ def is_valid_id(request):
     can not receive an argument for which object is to be mocked from the test.
     """
     return str(uuid4()) if request.param else None
+
+
+
+def mock_class_and_object(class_path, id=None, to_dict_ret=None):
+    from unittest.mock import MagicMock
+    from uuid import uuid4
+    mock_class = mock_with_patch(class_path)
+
+    # mock the object instance of that class
+    mock_obj = MagicMock()
+    mock_obj.id = id if id else str(uuid4())
+
+    # mock the .to_dict() method so it can be serialized
+    to_dict = to_dict_ret if to_dict_ret else {"id": id}
+    mock_obj.to_dict = MagicMock(return_value=to_dict)
+    return mock_class, mock_obj
 
 @pytest.fixture
 def mock_resource(method, is_valid_id, is_valid_data):
@@ -166,7 +183,7 @@ def mock_resource(method, is_valid_id, is_valid_data):
         The class will have mock .load_by_id and .load_by_attr methods.
         -----------------------------------------------------------------------
         '''
-        # patch the class
+        # patch the class     
         mock_class = mock_with_patch(class_path)
 
         # mock the object instance of that class

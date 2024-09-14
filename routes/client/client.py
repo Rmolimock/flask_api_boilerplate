@@ -1,18 +1,18 @@
 from models import Client
 from before_request import get_attr_from_request_form
 from routes.client import clients_v1
-from authorization import authorize
+from authorization import authorize_route
 
 
 @clients_v1.route("/", methods=["GET"], strict_slashes=False)
-@authorize
+@authorize_route
 def all_clients():
     clients = Client.load_all_dict(remove_attr="token")
     return {"clients": clients}, 200
 
 
 @clients_v1.route("/<id>", methods=["GET", "PUT", "DELETE"], strict_slashes=False)
-@authorize
+@authorize_route
 def client_by_id(id):
     from flask import request
 
