@@ -3,7 +3,7 @@ from authorization import unauthorized_message
 from conftest import normalized_put_method_name
 
 
-def test_status(method, is_authorized, is_valid_data, make_request):
+def test_status(method, is_authorized, is_valid_put_data, make_request):
     """
     Test the /status endpoint with the following parameters:
     - HTTP methods
@@ -16,7 +16,7 @@ def test_status(method, is_authorized, is_valid_data, make_request):
 
     # ACTION ==================================================================
     response = make_request(
-        method, "/status", data=is_valid_data, authorization=is_authorized
+        method, "/status", data=is_valid_put_data, authorization=is_authorized
     )
 
     # ASSERTIONS ==============================================================

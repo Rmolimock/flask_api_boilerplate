@@ -5,7 +5,7 @@ from uuid import uuid4
 from unittest.mock import MagicMock
 
 
-def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_request, mock_resource):
+def test_client_by_id(method, is_valid_id, is_authorized, is_valid_put_data, make_request, mock_resource):
     """
     Test the /clients/id endpoint with the following parameters:
     - HTTP methods
@@ -23,7 +23,7 @@ def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_re
     # mock updating data during PUT requests
     get_attr_from_request_form = mock_with_patch("routes.client.client.get_attr_from_request_form")
     get_attr_from_request_form.return_value = False
-    if method == "PUT" and is_valid_id and is_authorized and is_valid_data:
+    if method == "PUT" and is_valid_id and is_authorized and is_valid_put_data:
         get_attr_from_request_form.return_value = True 
 
     # ACTION ==================================================================
@@ -31,7 +31,7 @@ def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_re
         method,
         f"/v1/clients/{client_id}/",
         authorization=is_authorized,
-        data=is_valid_data,
+        data=is_valid_put_data,
     )
 
     # ASSERTIONS ==============================================================
@@ -58,7 +58,7 @@ def test_client_by_id(method, is_valid_id, is_authorized, is_valid_data, make_re
     # parameter to mock_resource. If token-found client.id is/isn't = is_valid_id.
 
     if method == "PUT":
-        if not is_valid_data:
+        if not is_valid_put_data:
             # method allowed, request authorized, valid id, but put data is invalid
             assert response.status_code == 400
             return

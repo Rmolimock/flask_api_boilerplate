@@ -51,12 +51,14 @@ def normalized_put_method_name(method):
     """
     Normalize PUT method names into 'PUT'. This is required because PUT-VALID
     and PUT-INVALID are used in the method parameter to inform the
-    is_valid_data fixture, allowing the parameterization of both types of requests. Then
+    is_valid_put_data fixture, allowing the parameterization of both types of requests. Then
     the actual method name must be normalized into a valid http method
     afterwards because it determines which request make_request will send.
     """
     if "PUT" in method or "put" in method:
         method = "PUT"
+    if "POST" in method or "post" in method:
+        method = "POST"
     return method
 
 
@@ -109,7 +111,7 @@ def make_request(api):
 # =============================================================================
 
 
-@pytest.fixture(params=["GET", "POST", "PUT-VALID", "PUT-INVALID", "DELETE"])
+@pytest.fixture(params=["GET", "POST-VALID", "POST-INVALID", "PUT-VALID", "PUT-INVALID", "DELETE"])
 def method(request):
     """
     Parameterize the methods only, not routes. So GET /obj and GET /obj/{id}
@@ -135,13 +137,22 @@ def is_authorized(request):
 
 
 @pytest.fixture()
-def is_valid_data(request, method):
+def is_valid_put_data(request, method):
     """
     Parameterizes whether or not the data for PUT requests is valid. Informed
     by teh method parameter.
     """
-    print(f"is_valid_data is {method == 'PUT-VALID'}")
-    return {"data": "valid data"} if method == "PUT-VALID" else {}
+    print(f"is_valid_put_data is {method == 'PUT-VALID'}")
+    return {"data": "valid put data"} if method == "PUT-VALID" else {}
+
+@pytest.fixture()
+def is_valid_post_data(request, method):
+    """
+    Parameterizes whether or not the data for PUT requests is valid. Informed
+    by teh method parameter.
+    """
+    print(f"is_valid_post_data is {method == 'POST-VALID'}")
+    return {"data": "valid post data"} if method == "POST-VALID" else {}
 
 
 @pytest.fixture(params=[True, False])
@@ -170,7 +181,7 @@ def mock_class_and_object(class_path, id=None, to_dict_ret=None):
     return mock_class, mock_obj
 
 @pytest.fixture
-def mock_resource(method, is_valid_id, is_valid_data):
+def mock_resource(method, is_valid_id, is_valid_put_data):
     from unittest.mock import MagicMock
     # if is_valid_id, return function for mocking a given class & object (values can be overridden)
     # else, return function that mocks class but has it's load methods return None (values can be overridden)
@@ -200,9 +211,9 @@ def mock_resource(method, is_valid_id, is_valid_data):
         else:
             mock_class.load_by_id.return_value = invalid_id_return if invalid_id_return is not False else None
 
-        if is_valid_data and "PUT" in method:
+        if is_valid_put_data and "PUT" in method:
             mock_class.load_by_attr.return_value = valid_attr_return if valid_attr_return is not False else None
-        elif not is_valid_data and "PUT" in method:
+        elif not is_valid_put_data and "PUT" in method:
             # put data is invalid if it's taken by another instance of that resource, which would
             # return an instance with a different id
             mock_obj.id = str(uuid4())
