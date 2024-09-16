@@ -11,7 +11,7 @@ def all_clients():
     return {"clients": clients}, 200
 
 
-@clients_v1.route("/<id>", methods=["GET", "PUT", "DELETE"], strict_slashes=False)
+@clients_v1.route("/<id>", methods=["GET", "PUT"], strict_slashes=False)
 @authorize_route
 def client_by_id(id):
     from flask import request

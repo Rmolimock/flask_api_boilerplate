@@ -37,7 +37,7 @@ def test_client_by_id(method, is_valid_id, is_authorized, is_valid_put_data, mak
     # ASSERTIONS ==============================================================
     # The order of these conditions is important and aligns with Flask's behavior.
 
-    if not method in ["GET", "PUT", "DELETE"]:
+    if not method in ["GET", "PUT"]:
         # method not allowed
         assert response.status_code == 405
         return
@@ -67,6 +67,7 @@ def test_client_by_id(method, is_valid_id, is_authorized, is_valid_put_data, mak
             assert response.status_code == 204
             return
     elif method == "DELETE":
+        # DISABLING DELETE FOR THE TIME BEING AS POTENTIAL SECURITY ISSUE
         # method allowed, request authorized, valid id, deleted
         assert response.status_code == 204
         return
