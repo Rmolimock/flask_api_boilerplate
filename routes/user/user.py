@@ -20,8 +20,13 @@ def has_valid_data(request):
     if not user_name or name_taken:
         return False
     return True
-    
 
+
+def create_user(**data):
+    user = User(**data)
+    user_dict = user.to_dict()
+    user.save()
+    return user_dict
 
 @users_v1.route("/", methods=["GET", "POST"], strict_slashes=False)
 @authorize_route
@@ -37,10 +42,8 @@ def all_users():
             "name": name,
             "client_id": client_id
         }
-        user = User(**data)
-        user_dict = user.to_dict()
-        user.save()
-        return {"message": "User created successfully.", "user": user_dict}, 207
+        user_dict = create_user(**data)
+        return {"message": "User created successfully.", "user": user_dict}, 201
 
     users = User.load_all_dict(remove_attr="client_id")
     return {"users": users}, 200

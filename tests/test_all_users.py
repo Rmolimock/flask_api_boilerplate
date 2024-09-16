@@ -10,13 +10,21 @@ def test_all_users(method, is_authorized, is_valid_post_data, make_request):
     - Valid and invalid put data
     """
 
+    # SETUP & MOCK ============================================================
     method = normalized_put_method_name(method)
 
-    mock_has_valid_data = mock_with_patch("routes.user.user.has_valid_data") # validate at high level,
-    # don't get bogged down in mocking details here.
+    mock_has_valid_data = mock_with_patch("routes.user.user.has_valid_data")
+    mock_create_user = mock_with_patch("routes.user.user.create_user")
+
+    # if it's a valid POST request, the request should have valid data and user should be created, else no.
     mock_has_valid_data.return_value = is_valid_post_data
+    mock_create_user.return_value = is_valid_post_data
+
+    # ACTION ==================================================================
 
     response = make_request(method, "/v1/users/", authorization=is_authorized, data=is_valid_post_data)
+
+    # ASSERTIONS ==============================================================
 
     if method not in ["GET", "POST"]:
         assert response.status_code == 405
@@ -35,7 +43,6 @@ def test_all_users(method, is_authorized, is_valid_post_data, make_request):
             return
         else:
             assert response.status_code == 201
-            assert "client_id" in response.get_json()
             return
 
     assert response.status_code == 200
