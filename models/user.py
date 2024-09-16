@@ -7,28 +7,33 @@ class User(BaseModel):
     """
     __tablename__ = "users"
 
-    name = db.Column(db.String(36), nullable=False)
     # client_id associated with a client model
     client_id = db.Column(db.String(36), db.ForeignKey("clients.id"), nullable=False)
     client = db.relationship("Client", backref=db.backref("users"))
 
-    def __init__(self, **kwargs):
+    name = db.Column(db.String(36), nullable=False)
+    email = db.Column(db.String(36), nullable=False)
 
-        if not kwargs.get("name"):
-            raise ValueError("User name is required")
-        
+    def __init__(self, **kwargs):
         client_id = kwargs.get("client_id")
         if not client_id:
             raise ValueError("Client ID is required")
+        
+        if not kwargs.get("name"):
+            raise ValueError("User name is required")
+        
+        if not kwargs.get("email"):
+            return ValueError("User email is required")
         
         client_valid = Client.load_by_id(client_id)
 
         if not client_valid:
             raise ValueError("Invalid client ID")
         
-        self.name = kwargs.get("name")
         self.client_id = client_id
         self.client = client_valid
+        self.name = kwargs.get("name")
+        self.email = kwargs.get("email")
 
         super(User, self).__init__(**kwargs)
 
